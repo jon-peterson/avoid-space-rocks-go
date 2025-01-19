@@ -1,4 +1,4 @@
-module avoid-space-rocks-go
+module avoid_the_space_rocks
 
 go 1.22
 
