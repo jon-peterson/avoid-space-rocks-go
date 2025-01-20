@@ -7,6 +7,7 @@ type GameObject struct {
 	SpriteSheet rl.Texture2D
 }
 
+// TODO: add filecheck and panic
 func MakeGameObject(spritesheet string) GameObject {
 	return GameObject{
 		SpriteSheet: rl.LoadTexture("assets/sprites/" + spritesheet),
