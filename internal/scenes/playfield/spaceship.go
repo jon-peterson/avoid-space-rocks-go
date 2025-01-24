@@ -2,16 +2,16 @@ package playfield
 
 import (
 	"avoid_the_space_rocks/internal/gameobjects"
-	"fmt"
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"math"
 )
 
 type Spaceship struct {
 	gameobjects.Transform
-	SpriteSheet rl.Texture2D
-	frameWidth  float32
-	frameHeight float32
-	frameCount  int
+	SpriteSheet rl.Texture2D // The texture with the packed sprites
+	frameWidth  float32      // Width of each frame
+	frameHeight float32      // Height of each frame
+	frameCount  int          // The number of frames in the sheet
 }
 
 func MakeSpaceship() Spaceship {
@@ -21,13 +21,15 @@ func MakeSpaceship() Spaceship {
 	ship.frameWidth = float32(ship.SpriteSheet.Width)
 	ship.frameHeight = float32(ship.SpriteSheet.Height / 3)
 	ship.frameCount = 3
+	// Traditionally starts pointing straight up
+	ship.Rotation = rl.Vector2{
+		X: 0.0,
+		Y: -1.0,
+	}
 	return ship
 }
 
-func (s *Spaceship) String() string {
-	return fmt.Sprintf("Yo: %z", s.Transform)
-}
-
+// Draw the spaceship at its current position and rotation
 func (s *Spaceship) Draw() {
 	frame := s.frame(1)
 	destination := rl.Rectangle{
@@ -36,9 +38,11 @@ func (s *Spaceship) Draw() {
 		Width:  s.frameWidth,
 		Height: s.frameHeight,
 	}
-	rl.DrawTexturePro(s.SpriteSheet, frame, destination, rl.Vector2{}, 0, rl.Black)
+	rotationDegrees := math.Atan2(float64(s.Rotation.Y), float64(s.Rotation.X)) * 180 / math.Pi
+	rl.DrawTexturePro(s.SpriteSheet, frame, destination, rl.Vector2{}, float32(rotationDegrees), rl.Black)
 }
 
+// Returns the rectangle coordinates of the specified frame in the spreadsheet
 func (s *Spaceship) frame(n int) rl.Rectangle {
 	if n < 1 || n > s.frameCount {
 		// Is this the right thing to do here?
