@@ -26,9 +26,7 @@ func render(world World) {
 	rl.BeginDrawing()
 
 	rl.ClearBackground(rl.RayWhite)
-	rl.DrawTexture(world.Spaceship.SpriteSheet,
-		int32(world.Spaceship.Transform.Position.X), int32(world.Spaceship.Transform.Position.Y),
-		rl.Black)
+	world.Spaceship.Draw()
 
 	rl.EndDrawing()
 }
