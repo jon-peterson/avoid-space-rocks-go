@@ -6,10 +6,10 @@ import (
 )
 
 type Transform struct {
-	position rl.Vector2
-	rotation rl.Vector2
+	Position rl.Vector2
+	Rotation rl.Vector2
 }
 
 func (t *Transform) String() string {
-	return fmt.Sprintf("pos (%f,%f) rot (%f,%f)", t.position.X, t.position.Y, t.rotation.X, t.rotation.Y)
+	return fmt.Sprintf("pos (%f,%f) rot (%f,%f)", t.Position.X, t.Position.Y, t.Rotation.X, t.Rotation.Y)
 }
