@@ -38,8 +38,13 @@ func (s *Spaceship) Draw() {
 		Width:  s.frameWidth,
 		Height: s.frameHeight,
 	}
+	// The origin is the center of the sprite, so rotation works around that center
+	origin := rl.Vector2{
+		X: s.frameWidth / 2,
+		Y: s.frameHeight / 2,
+	}
 	rotationDegrees := math.Atan2(float64(s.Rotation.Y), float64(s.Rotation.X)) * 180 / math.Pi
-	rl.DrawTexturePro(s.SpriteSheet, frame, destination, rl.Vector2{}, float32(rotationDegrees), rl.Black)
+	rl.DrawTexturePro(s.SpriteSheet, frame, destination, origin, float32(rotationDegrees), rl.Black)
 }
 
 // Returns the rectangle coordinates of the specified frame in the spreadsheet
