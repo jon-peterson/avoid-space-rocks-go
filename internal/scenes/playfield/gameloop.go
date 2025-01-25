@@ -20,11 +20,12 @@ func handleInput(world *World) {
 	if rl.IsKeyDown(rl.KeyRight) {
 		world.Spaceship.Rotation = rl.Vector2Rotate(world.Spaceship.Rotation, spaceshipRotateSpeed*delta)
 	}
+	world.Spaceship.FuelBurning = rl.IsKeyDown(rl.KeyUp)
 }
 
 // Update all game state since last time through game loop
 func update(world *World) {
-
+	world.Spaceship.Update()
 }
 
 // Draw all game state

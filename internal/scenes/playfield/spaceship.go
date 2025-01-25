@@ -7,11 +7,12 @@ import (
 )
 
 type Spaceship struct {
-	gameobjects.Transform
+	gameobjects.Rigidbody
 	SpriteSheet rl.Texture2D // The texture with the packed sprites
 	frameWidth  float32      // Width of each frame
 	frameHeight float32      // Height of each frame
 	frameCount  int          // The number of frames in the sheet
+	FuelBurning bool         // Is the user burning fuel to accelerate?
 }
 
 func MakeSpaceship() Spaceship {
@@ -29,9 +30,19 @@ func MakeSpaceship() Spaceship {
 	return ship
 }
 
+// Update the status of the spaceship given the current state of the game
+func (s *Spaceship) Update() {
+	if s.FuelBurning {
+		s.Velocity = rl.Vector2Add(s.Velocity, rl.Vector2Scale(s.Rotation, 0.01))
+	} else {
+		s.Velocity = rl.Vector2{}
+	}
+	s.Position = rl.Vector2Add(s.Position, s.Velocity)
+}
+
 // Draw the spaceship at its current position and rotation
 func (s *Spaceship) Draw() {
-	frame := s.frame(1)
+	frame := s.frame(s.frameIndex())
 	destination := rl.Rectangle{
 		X:      s.Transform.Position.X,
 		Y:      s.Transform.Position.Y,
@@ -47,16 +58,24 @@ func (s *Spaceship) Draw() {
 	rl.DrawTexturePro(s.SpriteSheet, frame, destination, origin, float32(rotationDegrees), rl.Black)
 }
 
+// frameIndex returns the index of the correct frame to use in the sprite sheet
+func (s *Spaceship) frameIndex() int {
+	if s.FuelBurning {
+		return 1
+	}
+	return 0
+}
+
 // Returns the rectangle coordinates of the specified frame in the spreadsheet
 func (s *Spaceship) frame(n int) rl.Rectangle {
-	if n < 1 || n > s.frameCount {
+	if n < 0 || n > s.frameCount-1 {
 		// Is this the right thing to do here?
 		panic("invalid frame number")
 	}
 	return rl.Rectangle{
 		X:      0,
-		Y:      0,
+		Y:      float32(n) * s.frameHeight,
 		Width:  s.frameWidth,
-		Height: float32(n) * s.frameHeight,
+		Height: s.frameHeight,
 	}
 }
