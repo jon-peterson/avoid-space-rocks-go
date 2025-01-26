@@ -58,10 +58,16 @@ func (s *Spaceship) Draw() {
 	rl.DrawTexturePro(s.SpriteSheet, frame, destination, origin, float32(rotationDegrees), rl.Black)
 }
 
-// frameIndex returns the index of the correct frame to use in the sprite sheet
+// frameIndex returns the index of the correct frame to use in the sprite sheet. There are two
+// fuel burning frames, so the index is either 0, 1, or 2.
 func (s *Spaceship) frameIndex() int {
 	if s.FuelBurning {
-		return 1
+		t := rl.GetTime()
+		if t-math.Floor(t) < 0.5 {
+			return 1
+		} else {
+			return 2
+		}
 	}
 	return 0
 }
