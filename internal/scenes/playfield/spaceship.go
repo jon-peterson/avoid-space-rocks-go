@@ -31,17 +31,17 @@ func MakeSpaceship() Spaceship {
 }
 
 // Update the status of the spaceship given the current state of the game
-func (s *Spaceship) Update() {
+func (s *Spaceship) Update(world *World) {
 	if s.FuelBurning {
 		s.Velocity = rl.Vector2Add(s.Velocity, rl.Vector2Scale(s.Rotation, 0.01))
 	} else {
 		s.Velocity = rl.Vector2{}
 	}
-	s.Position = rl.Vector2Add(s.Position, s.Velocity)
+	s.Position = world.Wraparound(rl.Vector2Add(s.Position, s.Velocity))
 }
 
 // Draw the spaceship at its current position and rotation
-func (s *Spaceship) Draw() {
+func (s *Spaceship) Draw(*World) {
 	frame := s.frame(s.frameIndex())
 	destination := rl.Rectangle{
 		X:      s.Transform.Position.X,

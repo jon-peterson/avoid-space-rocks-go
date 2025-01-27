@@ -25,7 +25,7 @@ func handleInput(world *World) {
 
 // Update all game state since last time through game loop
 func update(world *World) {
-	world.Spaceship.Update()
+	world.Spaceship.Update(world)
 }
 
 // Draw all game state
@@ -33,7 +33,7 @@ func render(world *World) {
 	rl.BeginDrawing()
 
 	rl.ClearBackground(rl.RayWhite)
-	world.Spaceship.Draw()
+	world.Spaceship.Draw(world)
 
 	rl.EndDrawing()
 }
