@@ -18,5 +18,6 @@ func main() {
 
 	// For now there's only one screen
 	world := playfield.MakeWorld(screenWidth, screenHeight)
-	playfield.GameLoop(&world)
+	playfield.InitGame(world)
+	playfield.GameLoop()
 }

@@ -38,8 +38,8 @@ func MakeSpaceship() Spaceship {
 	return ship
 }
 
-// Update the status of the spaceship given the current state of the game
-func (s *Spaceship) Update(world *World) {
+// Update the status of the spaceship
+func (s *Spaceship) Update() {
 	delta := rl.GetFrameTime()
 	if s.FuelBurning {
 		s.Velocity = rl.Vector2Add(s.Velocity, rl.Vector2Scale(s.Rotation, fuelBoost*delta))
@@ -49,11 +49,12 @@ func (s *Spaceship) Update(world *World) {
 		s.Velocity = rl.Vector2Scale(s.Velocity, 1-decaySpeed*delta)
 	}
 	// Position is updated after velocity is applied, so that the velocity is applied to the new position
-	s.Position = world.Wraparound(rl.Vector2Add(s.Position, s.Velocity))
+	game := GetGame()
+	s.Position = game.World.Wraparound(rl.Vector2Add(s.Position, s.Velocity))
 }
 
 // Draw the spaceship at its current position and rotation
-func (s *Spaceship) Draw(*World) {
+func (s *Spaceship) Draw() {
 	frame := s.frame(s.frameIndex())
 	destination := rl.Rectangle{
 		X:      s.Transform.Position.X,

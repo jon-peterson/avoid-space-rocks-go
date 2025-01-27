@@ -2,38 +2,41 @@ package playfield
 
 import rl "github.com/gen2brain/raylib-go/raylib"
 
-func GameLoop(world *World) {
+func GameLoop() {
 
 	for !rl.WindowShouldClose() {
-		handleInput(world)
-		update(world)
-		render(world)
+		handleInput()
+		update()
+		render()
 	}
 }
 
 // Handle player input
-func handleInput(world *World) {
+func handleInput() {
+	game := GetGame()
 	delta := rl.GetFrameTime()
 	if rl.IsKeyDown(rl.KeyLeft) {
-		world.Spaceship.Rotation = rl.Vector2Rotate(world.Spaceship.Rotation, -rotateSpeed*delta)
+		game.World.Spaceship.Rotation = rl.Vector2Rotate(game.World.Spaceship.Rotation, -rotateSpeed*delta)
 	}
 	if rl.IsKeyDown(rl.KeyRight) {
-		world.Spaceship.Rotation = rl.Vector2Rotate(world.Spaceship.Rotation, rotateSpeed*delta)
+		game.World.Spaceship.Rotation = rl.Vector2Rotate(game.World.Spaceship.Rotation, rotateSpeed*delta)
 	}
-	world.Spaceship.FuelBurning = rl.IsKeyDown(rl.KeyUp)
+	game.World.Spaceship.FuelBurning = rl.IsKeyDown(rl.KeyUp)
 }
 
 // Update all game state since last time through game loop
-func update(world *World) {
-	world.Spaceship.Update(world)
+func update() {
+	game := GetGame()
+	game.World.Spaceship.Update()
 }
 
 // Draw all game state
-func render(world *World) {
+func render() {
+	game := GetGame()
 	rl.BeginDrawing()
 
 	rl.ClearBackground(rl.RayWhite)
-	world.Spaceship.Draw(world)
+	game.World.Spaceship.Draw()
 
 	rl.EndDrawing()
 }
