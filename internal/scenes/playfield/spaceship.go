@@ -6,6 +6,14 @@ import (
 	"math"
 )
 
+// Constants for gameplay feel
+const (
+	rotateSpeed float32 = math.Pi * 3 // 1.5 rotations per second
+	maxSpeed    float32 = 20.0        // 20 units per second
+	decaySpeed  float32 = 2.0         // 5 units per second slower
+	fuelBoost   float32 = 10.0        // 10 units per second
+)
+
 type Spaceship struct {
 	gameobjects.Rigidbody
 	SpriteSheet rl.Texture2D // The texture with the packed sprites
@@ -32,11 +40,15 @@ func MakeSpaceship() Spaceship {
 
 // Update the status of the spaceship given the current state of the game
 func (s *Spaceship) Update(world *World) {
+	delta := rl.GetFrameTime()
 	if s.FuelBurning {
-		s.Velocity = rl.Vector2Add(s.Velocity, rl.Vector2Scale(s.Rotation, 0.01))
+		s.Velocity = rl.Vector2Add(s.Velocity, rl.Vector2Scale(s.Rotation, fuelBoost*delta))
+		s.Velocity = rl.Vector2ClampValue(s.Velocity, 0, maxSpeed)
 	} else {
-		s.Velocity = rl.Vector2{}
+		// Decrease the magnitude of the velocity vector by decaySpeed per second
+		s.Velocity = rl.Vector2Scale(s.Velocity, 1-decaySpeed*delta)
 	}
+	// Position is updated after velocity is applied, so that the velocity is applied to the new position
 	s.Position = world.Wraparound(rl.Vector2Add(s.Position, s.Velocity))
 }
 

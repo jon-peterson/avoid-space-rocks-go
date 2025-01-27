@@ -2,7 +2,6 @@ package playfield
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"math"
 )
 
 // The World object represents the state of the game within the playfield
@@ -11,11 +10,6 @@ type World struct {
 	height    float32 // Height of the playfield in worldspace
 	Spaceship Spaceship
 }
-
-// Constants for gameplay feel
-const (
-	spaceshipRotateSpeed float32 = math.Pi * 3 // 1.5 rotations per second
-)
 
 func MakeWorld(width float32, height float32) World {
 	w := World{
