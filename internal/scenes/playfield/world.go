@@ -11,9 +11,9 @@ type World struct {
 	Spaceship Spaceship
 }
 
-func MakeWorld(width float32, height float32) World {
+func NewWorld(width float32, height float32) World {
 	w := World{
-		Spaceship: MakeSpaceship(),
+		Spaceship: NewSpaceship(),
 		width:     width,
 		height:    height,
 	}

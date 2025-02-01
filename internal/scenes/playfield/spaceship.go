@@ -23,7 +23,7 @@ type Spaceship struct {
 	FuelBurning bool         // Is the user burning fuel to accelerate?
 }
 
-func MakeSpaceship() Spaceship {
+func NewSpaceship() Spaceship {
 	ship := Spaceship{
 		SpriteSheet: rl.LoadTexture("assets/sprites/spaceship.png"),
 	}

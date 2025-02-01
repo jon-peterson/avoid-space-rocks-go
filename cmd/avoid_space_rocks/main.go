@@ -17,7 +17,7 @@ func main() {
 	rl.SetTargetFPS(60)
 
 	// For now there's only one screen
-	world := playfield.MakeWorld(screenWidth, screenHeight)
+	world := playfield.NewWorld(screenWidth, screenHeight)
 	playfield.InitGame(world)
 	playfield.GameLoop()
 }
