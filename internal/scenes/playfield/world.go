@@ -1,6 +1,7 @@
 package playfield
 
 import (
+	"avoid_the_space_rocks/internal/gameobjects"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -9,15 +10,17 @@ type World struct {
 	width     float32 // Width of the playfield in worldspace
 	height    float32 // Height of the playfield in worldspace
 	Spaceship Spaceship
+	Objects   gameobjects.GameObjectCollection
 }
 
 func NewWorld(width float32, height float32) World {
 	w := World{
-		Spaceship: NewSpaceship(),
 		width:     width,
 		height:    height,
+		Objects:   gameobjects.NewGameObjectCollection(),
+		Spaceship: NewSpaceship(),
 	}
-	// Spaceship starts in the middle of the playfield
+	// Spaceship starts in the middle of the playfield and is always first
 	w.Spaceship.Position = rl.Vector2{
 		X: width / 2,
 		Y: height / 2,

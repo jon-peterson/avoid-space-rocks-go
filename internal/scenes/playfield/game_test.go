@@ -19,10 +19,6 @@ func TestInitGame(t *testing.T) {
 	if game.Score != 0 {
 		t.Errorf("Expected Score to be 0, got %d", game.Score)
 	}
-
-	if game.World != world {
-		t.Errorf("Expected World to be initialized correctly")
-	}
 }
 
 func TestGetGame(t *testing.T) {

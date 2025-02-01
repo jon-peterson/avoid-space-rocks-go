@@ -27,16 +27,20 @@ func handleInput() {
 // Update all game state since last time through game loop
 func update() {
 	game := GetGame()
-	game.World.Spaceship.Update()
+	if err := game.World.Spaceship.Update(); err != nil {
+		rl.TraceLog(rl.LogError, "error updating spaceship: %v", err)
+	}
+	game.World.Objects.Update()
 }
 
 // Draw all game state
 func render() {
 	game := GetGame()
 	rl.BeginDrawing()
-
 	rl.ClearBackground(rl.RayWhite)
-	game.World.Spaceship.Draw()
-
+	if err := game.World.Spaceship.Draw(); err != nil {
+		rl.TraceLog(rl.LogError, "error drawing spaceship: %v", err)
+	}
+	game.World.Objects.Draw()
 	rl.EndDrawing()
 }
