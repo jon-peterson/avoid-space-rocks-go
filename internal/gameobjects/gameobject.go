@@ -1,6 +1,6 @@
 package gameobjects
 
 type GameObject interface {
-	Update()
-	Draw()
+	Update() error
+	Draw() error
 }

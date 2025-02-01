@@ -16,20 +16,15 @@ const (
 
 type Spaceship struct {
 	gameobjects.Rigidbody
-	SpriteSheet rl.Texture2D // The texture with the packed sprites
-	frameWidth  float32      // Width of each frame
-	frameHeight float32      // Height of each frame
-	frameCount  int          // The number of frames in the sheet
-	FuelBurning bool         // Is the user burning fuel to accelerate?
+	gameobjects.SpriteSheet
+	FuelBurning bool // Is the user burning fuel to accelerate?
 }
 
 func NewSpaceship() Spaceship {
+	sheet, _ := gameobjects.NewSpriteSheet("spaceship.png", 3, 1)
 	ship := Spaceship{
-		SpriteSheet: rl.LoadTexture("assets/sprites/spaceship.png"),
+		SpriteSheet: sheet,
 	}
-	ship.frameWidth = float32(ship.SpriteSheet.Width)
-	ship.frameHeight = float32(ship.SpriteSheet.Height / 3)
-	ship.frameCount = 3
 	// Traditionally starts pointing straight up
 	ship.Rotation = rl.Vector2{
 		X: 0.0,
@@ -39,7 +34,7 @@ func NewSpaceship() Spaceship {
 }
 
 // Update the status of the spaceship
-func (s *Spaceship) Update() {
+func (s *Spaceship) Update() error {
 	delta := rl.GetFrameTime()
 	if s.FuelBurning {
 		s.Velocity = rl.Vector2Add(s.Velocity, rl.Vector2Scale(s.Rotation, fuelBoost*delta))
@@ -51,24 +46,13 @@ func (s *Spaceship) Update() {
 	// Position is updated after velocity is applied, so that the velocity is applied to the new position
 	game := GetGame()
 	s.Position = game.World.Wraparound(rl.Vector2Add(s.Position, s.Velocity))
+	return nil
 }
 
 // Draw the spaceship at its current position and rotation
-func (s *Spaceship) Draw() {
-	frame := s.frame(s.frameIndex())
-	destination := rl.Rectangle{
-		X:      s.Transform.Position.X,
-		Y:      s.Transform.Position.Y,
-		Width:  s.frameWidth,
-		Height: s.frameHeight,
-	}
-	// The origin is the center of the sprite, so rotation works around that center
-	origin := rl.Vector2{
-		X: s.frameWidth / 2,
-		Y: s.frameHeight / 2,
-	}
-	rotationDegrees := math.Atan2(float64(s.Rotation.Y), float64(s.Rotation.X)) * 180 / math.Pi
-	rl.DrawTexturePro(s.SpriteSheet, frame, destination, origin, float32(rotationDegrees), rl.Black)
+func (s *Spaceship) Draw() error {
+	frame := s.frameIndex()
+	return s.SpriteSheet.Draw(frame, 0, s.Position, s.Rotation)
 }
 
 // frameIndex returns the index of the correct frame to use in the sprite sheet. There are two
@@ -83,18 +67,4 @@ func (s *Spaceship) frameIndex() int {
 		}
 	}
 	return 0
-}
-
-// Returns the rectangle coordinates of the specified frame in the spreadsheet
-func (s *Spaceship) frame(n int) rl.Rectangle {
-	if n < 0 || n > s.frameCount-1 {
-		// Is this the right thing to do here?
-		panic("invalid frame number")
-	}
-	return rl.Rectangle{
-		X:      0,
-		Y:      float32(n) * s.frameHeight,
-		Width:  s.frameWidth,
-		Height: s.frameHeight,
-	}
 }
