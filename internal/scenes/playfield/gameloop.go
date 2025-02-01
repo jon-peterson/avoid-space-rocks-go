@@ -16,10 +16,10 @@ func handleInput() {
 	game := GetGame()
 	delta := rl.GetFrameTime()
 	if rl.IsKeyDown(rl.KeyLeft) {
-		game.World.Spaceship.Rotation = rl.Vector2Rotate(game.World.Spaceship.Rotation, -rotateSpeed*delta)
+		game.World.Spaceship.Rotation = rl.Vector2Rotate(game.World.Spaceship.Rotation, -shipRotateSpeed*delta)
 	}
 	if rl.IsKeyDown(rl.KeyRight) {
-		game.World.Spaceship.Rotation = rl.Vector2Rotate(game.World.Spaceship.Rotation, rotateSpeed*delta)
+		game.World.Spaceship.Rotation = rl.Vector2Rotate(game.World.Spaceship.Rotation, shipRotateSpeed*delta)
 	}
 	game.World.Spaceship.FuelBurning = rl.IsKeyDown(rl.KeyUp)
 }

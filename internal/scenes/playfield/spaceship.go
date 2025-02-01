@@ -6,14 +6,6 @@ import (
 	"math"
 )
 
-// Constants for gameplay feel
-const (
-	rotateSpeed float32 = math.Pi * 3 // 1.5 rotations per second
-	maxSpeed    float32 = 20.0        // 20 units per second
-	decaySpeed  float32 = 2.0         // 5 units per second slower
-	fuelBoost   float32 = 10.0        // 10 units per second
-)
-
 type Spaceship struct {
 	gameobjects.Rigidbody
 	gameobjects.SpriteSheet
@@ -23,7 +15,11 @@ type Spaceship struct {
 func NewSpaceship() Spaceship {
 	sheet, _ := gameobjects.NewSpriteSheet("spaceship.png", 3, 1)
 	ship := Spaceship{
+		Rigidbody: gameobjects.Rigidbody{
+			MaxVelocity: shipMaxSpeed,
+		},
 		SpriteSheet: sheet,
+		FuelBurning: false,
 	}
 	// Traditionally starts pointing straight up
 	ship.Rotation = rl.Vector2{
@@ -37,12 +33,13 @@ func NewSpaceship() Spaceship {
 func (s *Spaceship) Update() error {
 	delta := rl.GetFrameTime()
 	if s.FuelBurning {
-		s.Velocity = rl.Vector2Add(s.Velocity, rl.Vector2Scale(s.Rotation, fuelBoost*delta))
-		s.Velocity = rl.Vector2ClampValue(s.Velocity, 0, maxSpeed)
+		s.Acceleration = rl.Vector2Scale(s.Rotation, shipFuelBoost*delta)
 	} else {
-		// Decrease the magnitude of the velocity vector by decaySpeed per second
-		s.Velocity = rl.Vector2Scale(s.Velocity, 1-decaySpeed*delta)
+		// Decrease the magnitude of the velocity vector by shipDecaySpeed per second
+		s.Acceleration = rl.Vector2{}
+		s.Velocity = rl.Vector2Scale(s.Velocity, 1-shipDecaySpeed*delta)
 	}
+	s.Rigidbody.ApplyPhysics()
 	// Position is updated after velocity is applied, so that the velocity is applied to the new position
 	game := GetGame()
 	s.Position = game.World.Wraparound(rl.Vector2Add(s.Position, s.Velocity))

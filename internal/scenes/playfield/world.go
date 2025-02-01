@@ -13,19 +13,27 @@ type World struct {
 	Objects   gameobjects.GameObjectCollection
 }
 
-func NewWorld(width float32, height float32) World {
+func NewWorld(width, height int32) World {
 	w := World{
-		width:     width,
-		height:    height,
-		Objects:   gameobjects.NewGameObjectCollection(),
-		Spaceship: NewSpaceship(),
-	}
-	// Spaceship starts in the middle of the playfield and is always first
-	w.Spaceship.Position = rl.Vector2{
-		X: width / 2,
-		Y: height / 2,
+		width:  float32(width),
+		height: float32(height),
 	}
 	return w
+}
+
+func (w *World) InitializeLevel(level int) {
+	w.Objects = gameobjects.NewGameObjectCollection()
+	// Spaceship starts in the middle pointing up
+	w.Spaceship = NewSpaceship()
+	w.Spaceship.Position = rl.Vector2{
+		X: w.width / 2,
+		Y: w.height / 2,
+	}
+	// Random rocks based on the level number
+	for i := 0; i < 4; i++ {
+		rock := NewRockBig()
+		w.Objects.Add(&rock)
+	}
 }
 
 // Wraparound returns the position of the given position, wrapping around the edges of the playfield

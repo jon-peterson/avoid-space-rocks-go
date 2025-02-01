@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	screenWidth  = 800
-	screenHeight = 450
+	screenWidth  = 1024
+	screenHeight = 768
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 	rl.SetTargetFPS(60)
 
 	// For now there's only one screen
-	world := playfield.NewWorld(screenWidth, screenHeight)
-	playfield.InitGame(world)
+	game := playfield.InitGame(screenWidth, screenHeight)
+	game.World.InitializeLevel(1)
 	playfield.GameLoop()
 }
