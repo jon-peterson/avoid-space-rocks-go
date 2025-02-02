@@ -6,12 +6,14 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+// Rock is a game object that has a consistent rotation speed and constant velocity.
 type Rock struct {
 	gameobjects.Rigidbody
 	gameobjects.SpriteSheet
 	rotationSpeed float32 // rotations per second
 }
 
+// NewRockBig creates a new large rock with a random position and velocity, spinning randomly.
 func NewRockBig() Rock {
 	sheet, _ := gameobjects.NewSpriteSheet("rock_big.png", 1, 1)
 	rock := Rock{
@@ -33,6 +35,7 @@ func NewRockBig() Rock {
 	return rock
 }
 
+// Update applies physics to the rock so it moves per its velocity and rotation speed.
 func (r *Rock) Update() error {
 	game := GetGame()
 	delta := rl.GetFrameTime()
@@ -42,6 +45,7 @@ func (r *Rock) Update() error {
 	return nil
 }
 
+// Draw renders the rock to the screen.
 func (r *Rock) Draw() error {
 	return r.SpriteSheet.Draw(0, 0, r.Position, r.Rotation)
 }
