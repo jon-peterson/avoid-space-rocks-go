@@ -7,6 +7,7 @@ import (
 )
 
 type SpriteSheet struct {
+	name        string
 	texture     rl.Texture2D // The texture with the packed sprites
 	frameWidth  int32        // Width of each frame in pixels
 	frameHeight int32        // Height of each frame pixels
@@ -26,6 +27,7 @@ func NewSpriteSheet(file string, rows, cols int32) (SpriteSheet, error) {
 	}
 
 	s := SpriteSheet{
+		name:        file,
 		texture:     sheetTexture,
 		frameWidth:  sheetTexture.Width / cols,
 		frameHeight: sheetTexture.Height / rows,
@@ -37,7 +39,7 @@ func NewSpriteSheet(file string, rows, cols int32) (SpriteSheet, error) {
 }
 
 func (s *SpriteSheet) String() string {
-	return fmt.Sprintf("%v (%dx%d)", s.texture, s.frameWidth, s.frameHeight)
+	return fmt.Sprintf("%s (%dx%d)", s.name, s.frameWidth, s.frameHeight)
 }
 
 // Draw the sprite at the given frame at the given location and rotation
