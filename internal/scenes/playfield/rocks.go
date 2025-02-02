@@ -2,8 +2,8 @@ package playfield
 
 import (
 	"avoid_the_space_rocks/internal/gameobjects"
+	"avoid_the_space_rocks/internal/utils"
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"math/rand"
 )
 
 type Rock struct {
@@ -19,31 +19,32 @@ func NewRockBig() Rock {
 	}
 	game := GetGame()
 	rock.Position = rl.Vector2{
-		X: rand.Float32() * game.World.width,
-		Y: rand.Float32() * game.World.height,
+		X: random.Float32(game.World.width),
+		Y: random.Float32(game.World.height),
 	}
-	rock.rotationSpeed = rand.Float32() * rockMaxRotate
-	if rand.Intn(2) == 0 {
+	rock.rotationSpeed = random.Float32(rockMaxRotate) / 4
+	if random.Chance(0.5) {
 		rock.rotationSpeed = -rock.rotationSpeed
 	}
-	// Create a random velocity vector
-	rock.MaxVelocity = rockMaxSpeed
+	// Create a random velocity vector; big rocks are slow
+	rock.MaxVelocity = rockMaxSpeed / 4
 	rock.Velocity = rl.Vector2{
-		X: (rand.Float32() * rockMaxSpeed * 2) - rand.Float32(),
-		Y: (rand.Float32() * rockMaxSpeed * 2) - rand.Float32(),
+		X: random.Float32InRange(-rock.MaxVelocity, rock.MaxVelocity),
+		Y: random.Float32InRange(-rock.MaxVelocity, rock.MaxVelocity),
 	}
+	rock.Rotation = rl.Vector2{X: 1, Y: 0}
 	return rock
 }
 
-func (r Rock) Update() error {
+func (r *Rock) Update() error {
 	game := GetGame()
 	delta := rl.GetFrameTime()
 	r.Rotation = rl.Vector2Rotate(r.Rotation, r.rotationSpeed*delta)
 	r.Rigidbody.ApplyPhysics()
-	game.World.Wraparound(r.Position)
+	r.Position = game.World.Wraparound(r.Position)
 	return nil
 }
 
-func (r Rock) Draw() error {
+func (r *Rock) Draw() error {
 	return r.SpriteSheet.Draw(0, 0, r.Position, r.Rotation)
 }
