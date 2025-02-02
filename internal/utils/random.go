@@ -34,3 +34,8 @@ func Chance(chance float32) bool {
 	}
 	return rand.Float32() < chance
 }
+
+// Choice returns a random element from the given slice.
+func Choice(float32s []float32) float32 {
+	return float32s[rand.Intn(len(float32s))]
+}

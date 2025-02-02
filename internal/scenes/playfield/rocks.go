@@ -18,10 +18,7 @@ func NewRockBig() Rock {
 		SpriteSheet: sheet,
 	}
 	game := GetGame()
-	rock.Position = rl.Vector2{
-		X: random.Float32(game.World.width),
-		Y: random.Float32(game.World.height),
-	}
+	rock.Position = game.World.RandomBorderLocation()
 	rock.rotationSpeed = random.Float32(rockMaxRotate) / 4
 	if random.Chance(0.5) {
 		rock.rotationSpeed = -rock.rotationSpeed
