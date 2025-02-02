@@ -5,8 +5,7 @@ import (
 )
 
 func TestInitGame(t *testing.T) {
-	world := World{} // Assuming World is a struct that can be initialized like this
-	game := InitGame(world)
+	game := InitGame(200, 500)
 
 	if game.Lives != 3 {
 		t.Errorf("Expected Lives to be 3, got %d", game.Lives)
@@ -19,11 +18,18 @@ func TestInitGame(t *testing.T) {
 	if game.Score != 0 {
 		t.Errorf("Expected Score to be 0, got %d", game.Score)
 	}
+
+	if game.World.width != 200 {
+		t.Errorf("Expected World width to be 200, got %f", game.World.width)
+	}
+
+	if game.World.height != 500 {
+		t.Errorf("Expected World height to be 500, got %f", game.World.height)
+	}
 }
 
 func TestGetGame(t *testing.T) {
-	world := World{}
-	InitGame(world)
+	InitGame(800, 600)
 
 	game := GetGame()
 	if game == nil {
