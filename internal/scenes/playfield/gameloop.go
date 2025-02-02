@@ -13,15 +13,17 @@ func GameLoop() {
 
 // Handle player input
 func handleInput() {
-	game := GetGame()
-	delta := rl.GetFrameTime()
+	spaceship := &GetGame().World.Spaceship
 	if rl.IsKeyDown(rl.KeyLeft) {
-		game.World.Spaceship.Rotation = rl.Vector2Rotate(game.World.Spaceship.Rotation, -shipRotateSpeed*delta)
+		spaceship.RotateLeft()
 	}
 	if rl.IsKeyDown(rl.KeyRight) {
-		game.World.Spaceship.Rotation = rl.Vector2Rotate(game.World.Spaceship.Rotation, shipRotateSpeed*delta)
+		spaceship.RotateRight()
 	}
-	game.World.Spaceship.FuelBurning = rl.IsKeyDown(rl.KeyUp)
+	if rl.IsKeyPressed(rl.KeySpace) {
+		spaceship.Fire()
+	}
+	spaceship.FuelBurning = rl.IsKeyDown(rl.KeyUp)
 }
 
 // Update all game state since last time through game loop

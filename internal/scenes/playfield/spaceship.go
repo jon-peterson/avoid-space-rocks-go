@@ -52,6 +52,25 @@ func (s *Spaceship) Draw() error {
 	return s.SpriteSheet.Draw(frame, 0, s.Position, s.Rotation)
 }
 
+// RotateLeft rotates the spaceship to the left the standard amount
+func (s *Spaceship) RotateLeft() {
+	delta := rl.GetFrameTime()
+	s.Rotation = rl.Vector2Rotate(s.Rotation, -shipRotateSpeed*delta)
+}
+
+// RotateRight rotates the spaceship to the right the standard amount
+func (s *Spaceship) RotateRight() {
+	delta := rl.GetFrameTime()
+	s.Rotation = rl.Vector2Rotate(s.Rotation, shipRotateSpeed*delta)
+}
+
+// Fire creates a new bullet with the spaceship's current position and rotation
+func (s *Spaceship) Fire() {
+	b := NewBullet(s.Position, s.Rotation)
+	b.Velocity = rl.Vector2Add(rl.Vector2Scale(s.Rotation, bulletSpeed), s.Velocity)
+	GetGame().World.Objects.Add(&b)
+}
+
 // frameIndex returns the index of the correct frame to use in the sprite sheet. There are two
 // fuel burning frames, so the index is either 0, 1, or 2.
 func (s *Spaceship) frameIndex() int {
