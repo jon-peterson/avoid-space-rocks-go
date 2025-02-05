@@ -15,8 +15,9 @@ const (
 	shipDecaySpeed  float32 = 3.0         // units per second slower
 	shipFuelBoost   float32 = 10.0        // units per second added to acceleration
 
-	bulletSpeed    float32 = 10.0 // units per second
-	bulletMaxSpeed float32 = 20.0 // units per second
+	bulletSpeed      float32 = 10.0 // units per second
+	bulletMaxSpeed   float32 = 20.0 // units per second
+	bulletLifetimeMs int64   = 1000
 
 	rockMaxSpeed  float32 = 10.0
 	rockMaxRotate float32 = math.Pi * 6 // 3 rotations per second

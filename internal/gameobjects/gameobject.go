@@ -7,6 +7,7 @@ import (
 type GameObject interface {
 	Update() error
 	Draw() error
+	IsAlive() bool
 }
 
 type GameObjectCollection struct {
@@ -24,6 +25,16 @@ func (c *GameObjectCollection) Add(obj GameObject) {
 }
 
 func (c *GameObjectCollection) Update() {
+	// Remove all dead objects from the collection
+	for i := len(c.objects) - 1; i >= 0; i-- {
+		if !c.objects[i].IsAlive() {
+			// Replace the current element with the one at the end
+			c.objects[i] = c.objects[len(c.objects)-1]
+			c.objects = c.objects[:len(c.objects)-1]
+		}
+	}
+
+	// Update all the remaining
 	for idx, obj := range c.objects {
 		if err := obj.Update(); err != nil {
 			rl.TraceLog(rl.LogError, "error updating object %d %v: %v", idx, obj, err)

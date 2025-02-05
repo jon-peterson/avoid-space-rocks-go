@@ -3,11 +3,13 @@ package playfield
 import (
 	"avoid_the_space_rocks/internal/gameobjects"
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"time"
 )
 
 type Bullet struct {
 	gameobjects.Rigidbody
 	gameobjects.SpriteSheet
+	born time.Time
 }
 
 // NewBullet creates a new bullet with a given position and velocity.
@@ -15,6 +17,7 @@ func NewBullet(position, direction rl.Vector2) Bullet {
 	sheet, _ := gameobjects.NewSpriteSheet("bullet.png", 1, 1)
 	bullet := Bullet{
 		SpriteSheet: sheet,
+		born:        time.Now(),
 	}
 	bullet.Position = position
 	bullet.Velocity = direction
@@ -33,4 +36,8 @@ func (b *Bullet) Update() error {
 // Draw renders the bullet to the screen.
 func (b *Bullet) Draw() error {
 	return b.SpriteSheet.Draw(0, 0, b.Position, b.Rotation)
+}
+
+func (b *Bullet) IsAlive() bool {
+	return time.Since(b.born).Milliseconds() < bulletLifetimeMs
 }

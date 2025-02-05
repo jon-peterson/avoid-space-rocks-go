@@ -11,6 +11,7 @@ type Rock struct {
 	gameobjects.Rigidbody
 	gameobjects.SpriteSheet
 	rotationSpeed float32 // rotations per second
+	isAlive       bool
 }
 
 // NewRockBig creates a new large rock with a random position and velocity, spinning randomly.
@@ -18,6 +19,7 @@ func NewRockBig() Rock {
 	sheet, _ := gameobjects.NewSpriteSheet("rock_big.png", 1, 1)
 	rock := Rock{
 		SpriteSheet: sheet,
+		isAlive:     true,
 	}
 	game := GetGame()
 	rock.Position = game.World.RandomBorderLocation()
@@ -48,4 +50,8 @@ func (r *Rock) Update() error {
 // Draw renders the rock to the screen.
 func (r *Rock) Draw() error {
 	return r.SpriteSheet.Draw(0, 0, r.Position, r.Rotation)
+}
+
+func (r *Rock) IsAlive() bool {
+	return r.isAlive
 }
