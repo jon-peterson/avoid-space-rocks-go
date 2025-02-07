@@ -10,6 +10,11 @@ type GameObject interface {
 	IsAlive() bool
 }
 
+type Collidable interface {
+	OnCollision(other Collidable) error
+	GetHitbox() rl.Rectangle
+}
+
 type GameObjectCollection struct {
 	objects []GameObject
 }
@@ -24,6 +29,8 @@ func (c *GameObjectCollection) Add(obj GameObject) {
 	c.objects = append(c.objects, obj)
 }
 
+// Update all the objects in the collection. Removes dead objects, updates the rest.
+// Checks for collisions between objects.
 func (c *GameObjectCollection) Update() {
 	// Remove all dead objects from the collection
 	for i := len(c.objects) - 1; i >= 0; i-- {
@@ -39,6 +46,46 @@ func (c *GameObjectCollection) Update() {
 		if err := obj.Update(); err != nil {
 			rl.TraceLog(rl.LogError, "error updating object %d %v: %v", idx, obj, err)
 		}
+	}
+
+	// Check for collisions on all the collidable objects
+	c.collisionCheck()
+}
+
+// CollisionCheck checks for collisions between all the Collidable objects in the
+// collection. When two objects collide they have their OnCollision methods called.
+// TODO: Use spatial partitioning so it's not O(n^2)
+func (c *GameObjectCollection) collisionCheck() {
+	for i := len(c.objects) - 1; i >= 0; i-- {
+		hammer := c.getCollidable(i)
+		if hammer == nil {
+			continue
+		}
+		for j := i - 1; j >= 0; j-- {
+			anvil := c.getCollidable(j)
+			if anvil == nil {
+				continue
+			}
+			if rl.CheckCollisionRecs(hammer.GetHitbox(), anvil.GetHitbox()) {
+				if err := hammer.OnCollision(anvil); err != nil {
+					rl.TraceLog(rl.LogError, "error handling collision between %d %v and %d %v: %v", i, hammer, j, anvil, err)
+				}
+				if err := anvil.OnCollision(hammer); err != nil {
+					rl.TraceLog(rl.LogError, "error handling collision between %d %v and %d %v: %v", j, anvil, i, hammer, err)
+				}
+			}
+		}
+	}
+}
+
+// getCollidable returns an interface on a game object that is both collidable and alive, or nil.
+func (c *GameObjectCollection) getCollidable(idx int) Collidable {
+	obj := c.objects[idx]
+	cast, ok := obj.(Collidable)
+	if ok && obj.IsAlive() {
+		return cast
+	} else {
+		return nil
 	}
 }
 
