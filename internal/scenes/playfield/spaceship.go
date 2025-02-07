@@ -15,16 +15,14 @@ type Spaceship struct {
 func NewSpaceship() Spaceship {
 	sheet, _ := gameobjects.NewSpriteSheet("spaceship.png", 3, 1)
 	ship := Spaceship{
+		SpriteSheet: sheet,
 		Rigidbody: gameobjects.Rigidbody{
 			MaxVelocity: shipMaxSpeed,
+			Transform: gameobjects.Transform{
+				Rotation: rl.Vector2{X: 0, Y: -1},
+			},
 		},
-		SpriteSheet: sheet,
 		FuelBurning: false,
-	}
-	// Traditionally starts pointing straight up
-	ship.Rotation = rl.Vector2{
-		X: 0.0,
-		Y: -1.0,
 	}
 	return ship
 }

@@ -16,24 +16,29 @@ type Rock struct {
 
 // NewRockBig creates a new large rock with a random position and velocity, spinning randomly.
 func NewRockBig() Rock {
+	game := GetGame()
 	sheet, _ := gameobjects.NewSpriteSheet("rock_big.png", 1, 1)
 	rock := Rock{
 		SpriteSheet: sheet,
-		isAlive:     true,
+		Rigidbody: gameobjects.Rigidbody{
+			Transform: gameobjects.Transform{
+				Position: game.World.RandomBorderLocation(),
+				Rotation: rl.Vector2{X: 1, Y: 0},
+			},
+		},
+		rotationSpeed: random.Float32(rockMaxRotate) / 4,
+		isAlive:       true,
 	}
-	game := GetGame()
-	rock.Position = game.World.RandomBorderLocation()
-	rock.rotationSpeed = random.Float32(rockMaxRotate) / 4
+	// Half of 'em rotate counterclockwise
 	if random.Chance(0.5) {
 		rock.rotationSpeed = -rock.rotationSpeed
 	}
-	// Create a random velocity vector; big rocks are slow
+	// Randomize the speed and direction
 	rock.MaxVelocity = rockMaxSpeed / 4
 	rock.Velocity = rl.Vector2{
 		X: random.Float32InRange(-rock.MaxVelocity, rock.MaxVelocity),
 		Y: random.Float32InRange(-rock.MaxVelocity, rock.MaxVelocity),
 	}
-	rock.Rotation = rl.Vector2{X: 1, Y: 0}
 	return rock
 }
 

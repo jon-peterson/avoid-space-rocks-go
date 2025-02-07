@@ -13,15 +13,19 @@ type Bullet struct {
 }
 
 // NewBullet creates a new bullet with a given position and velocity.
-func NewBullet(position, direction rl.Vector2) Bullet {
+func NewBullet(position, velocity rl.Vector2) Bullet {
 	sheet, _ := gameobjects.NewSpriteSheet("bullet.png", 1, 1)
 	bullet := Bullet{
 		SpriteSheet: sheet,
-		born:        time.Now(),
+		Rigidbody: gameobjects.Rigidbody{
+			Velocity:    velocity,
+			MaxVelocity: bulletMaxSpeed,
+			Transform: gameobjects.Transform{
+				Position: position,
+			},
+		},
+		born: time.Now(),
 	}
-	bullet.Position = position
-	bullet.Velocity = direction
-	bullet.MaxVelocity = bulletMaxSpeed
 	return bullet
 }
 
