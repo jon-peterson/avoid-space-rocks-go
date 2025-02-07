@@ -9,8 +9,12 @@ import (
 type Bullet struct {
 	gameobjects.Rigidbody
 	gameobjects.SpriteSheet
-	born time.Time
+	isAlive bool
+	born    time.Time
 }
+
+var _ gameobjects.Collidable = (*Bullet)(nil)
+var _ gameobjects.GameObject = (*Bullet)(nil)
 
 // NewBullet creates a new bullet with a given position and velocity.
 func NewBullet(position, velocity rl.Vector2) Bullet {
@@ -24,7 +28,8 @@ func NewBullet(position, velocity rl.Vector2) Bullet {
 				Position: position,
 			},
 		},
-		born: time.Now(),
+		isAlive: true,
+		born:    time.Now(),
 	}
 	return bullet
 }
@@ -42,6 +47,27 @@ func (b *Bullet) Draw() error {
 	return b.SpriteSheet.Draw(0, 0, b.Position, b.Rotation)
 }
 
+// IsAlive returns true if the bullet is still alive. Always dead after its lifetime.
 func (b *Bullet) IsAlive() bool {
-	return time.Since(b.born).Milliseconds() < bulletLifetimeMs
+	return b.isAlive && time.Since(b.born).Milliseconds() < bulletLifetimeMs
+}
+
+// GetHitbox returns the hitbox of the bullet, used for basic collision detection.
+func (b *Bullet) GetHitbox() rl.Rectangle {
+	return rl.Rectangle{
+		X:      b.Position.X,
+		Y:      b.Position.Y,
+		Width:  1,
+		Height: 1,
+	}
+}
+
+// OnCollision handles the collision of the bullet with another object.
+func (b *Bullet) OnCollision(other gameobjects.Collidable) error {
+	// Bullets can only destroy rocks
+	rock, ok := other.(*Rock)
+	if ok {
+		rock.isAlive = false
+	}
+	return nil
 }

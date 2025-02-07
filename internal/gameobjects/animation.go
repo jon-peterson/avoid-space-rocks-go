@@ -71,3 +71,13 @@ func (s *SpriteSheet) frame(row, col int) (rl.Rectangle, error) {
 		Height: float32(s.frameHeight),
 	}, nil
 }
+
+// GetRectangle returns the bounding rectangle where this sprite will be drawn centered at center
+func (s *SpriteSheet) GetRectangle(center rl.Vector2) rl.Rectangle {
+	return rl.Rectangle{
+		X:      center.X - float32(s.frameWidth)/2,
+		Y:      center.Y - float32(s.frameHeight)/2,
+		Width:  float32(s.frameWidth),
+		Height: float32(s.frameHeight),
+	}
+}

@@ -14,6 +14,9 @@ type Rock struct {
 	isAlive       bool
 }
 
+var _ gameobjects.Collidable = (*Rock)(nil)
+var _ gameobjects.GameObject = (*Rock)(nil)
+
 // NewRockBig creates a new large rock with a random position and velocity, spinning randomly.
 func NewRockBig() Rock {
 	game := GetGame()
@@ -57,6 +60,18 @@ func (r *Rock) Draw() error {
 	return r.SpriteSheet.Draw(0, 0, r.Position, r.Rotation)
 }
 
+// IsAlive returns whether the rock is alive or not.
 func (r *Rock) IsAlive() bool {
 	return r.isAlive
+}
+
+// GetHitbox returns the hitbox of the rock, used for basic collision detection.
+func (r *Rock) GetHitbox() rl.Rectangle {
+	return r.SpriteSheet.GetRectangle(r.Position)
+}
+
+// OnCollision handles the collision with another Collidable object.
+func (r *Rock) OnCollision(other gameobjects.Collidable) error {
+	// TODO: Check for collision with the spaceship
+	return nil
 }

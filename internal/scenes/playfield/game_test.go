@@ -1,11 +1,18 @@
 package playfield
 
 import (
+	"os"
 	"testing"
 )
 
+func TestMain(m *testing.M) {
+	InitGame(800, 600)
+	code := m.Run()
+	os.Exit(code)
+}
+
 func TestInitGame(t *testing.T) {
-	game := InitGame(200, 500)
+	game := GetGame()
 
 	if game.Lives != 3 {
 		t.Errorf("Expected Lives to be 3, got %d", game.Lives)
@@ -19,18 +26,16 @@ func TestInitGame(t *testing.T) {
 		t.Errorf("Expected Score to be 0, got %d", game.Score)
 	}
 
-	if game.World.width != 200 {
-		t.Errorf("Expected World width to be 200, got %f", game.World.width)
+	if game.World.width != 800 {
+		t.Errorf("Expected World width to be 800, got %f", game.World.width)
 	}
 
-	if game.World.height != 500 {
-		t.Errorf("Expected World height to be 500, got %f", game.World.height)
+	if game.World.height != 600 {
+		t.Errorf("Expected World height to be 600, got %f", game.World.height)
 	}
 }
 
 func TestGetGame(t *testing.T) {
-	InitGame(800, 600)
-
 	game := GetGame()
 	if game == nil {
 		t.Fatal("Expected game to be initialized, got nil")
