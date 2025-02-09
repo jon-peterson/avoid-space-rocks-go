@@ -63,5 +63,4 @@ func (w *World) RandomBorderLocation() rl.Vector2 {
 		X: random.Choice([]float32{0, w.width}),
 		Y: random.RndFloat32(w.height),
 	}
-
 }

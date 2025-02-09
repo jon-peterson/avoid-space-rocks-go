@@ -52,7 +52,7 @@ func TestBullet_OnCollision(t *testing.T) {
 	}
 
 	// Check if the bullet is still alive after collision
-	if !bullet.IsAlive() {
-		t.Errorf("Expected bullet to be alive after collision")
+	if bullet.IsAlive() {
+		t.Errorf("Expected bullet to be destroyed after collision")
 	}
 }

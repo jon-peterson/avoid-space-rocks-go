@@ -9,18 +9,18 @@ import (
 type RockSize int
 
 const (
-	RockBig RockSize = iota
-	RockMedium
+	RockTiny RockSize = iota
 	RockSmall
-	RockTiny
+	RockMedium
+	RockBig
 )
 
 // Create a constant array of four string elements
 var rockSpriteFile = []string{
-	"rock_big.png",
-	"rock_medium.png",
-	"rock_small.png",
 	"rock_tiny.png",
+	"rock_small.png",
+	"rock_medium.png",
+	"rock_big.png",
 }
 
 // Rock is a game object that has a consistent rotation speed and constant velocity.
@@ -54,7 +54,7 @@ func NewRock(size RockSize, position rl.Vector2) Rock {
 		rock.rotationSpeed = -rock.rotationSpeed
 	}
 	// Randomize the speed and direction
-	rock.MaxVelocity = rockMaxSpeed / float32(4-size)
+	rock.MaxVelocity = rockMaxSpeed / float32(size+2)
 	rock.Velocity = rl.Vector2{
 		X: utils.RndFloat32InRange(-rock.MaxVelocity, rock.MaxVelocity),
 		Y: utils.RndFloat32InRange(-rock.MaxVelocity, rock.MaxVelocity),

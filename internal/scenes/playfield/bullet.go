@@ -2,6 +2,7 @@ package playfield
 
 import (
 	"avoid_the_space_rocks/internal/gameobjects"
+	"avoid_the_space_rocks/internal/utils"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"time"
 )
@@ -67,7 +68,20 @@ func (b *Bullet) OnCollision(other gameobjects.Collidable) error {
 	// Bullets can only destroy rocks
 	rock, ok := other.(*Rock)
 	if ok {
+		// Both the rock and the bullet die
 		rock.isAlive = false
+		b.isAlive = false
+		// So long as it isn't a tiny rock, spawn more smaller rocks at same loc
+		if rock.size > RockTiny {
+			game := GetGame()
+			for range utils.RndInt32InRange(2, 4) {
+				// Spawn a new rock at the same position as the old one but a bit back
+				newRock := NewRock(rock.size-1, rl.Vector2Add(rock.Position, b.Velocity))
+				game.World.Objects.Add(&newRock)
+				// Add a bit of bullet velocity to each new rock so more likely moving away
+				newRock.Velocity = rl.Vector2Add(newRock.Velocity, rl.Vector2Scale(b.Velocity, 0.1))
+			}
+		}
 	}
 	return nil
 }
