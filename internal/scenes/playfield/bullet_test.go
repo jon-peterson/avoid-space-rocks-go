@@ -3,7 +3,6 @@ package playfield
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"testing"
-	"time"
 )
 
 func TestBullet_IsAlive(t *testing.T) {
@@ -15,7 +14,7 @@ func TestBullet_IsAlive(t *testing.T) {
 	}
 
 	// Test that the bullet is not alive after its lifetime has passed
-	time.Sleep(time.Duration(bulletLifetimeMs+1) * time.Millisecond)
+	bullet.lifetimeMs = bulletLifetimeMs + 1
 	if bullet.IsAlive() {
 		t.Errorf("Expected bullet to be dead after its lifetime has passed")
 	}

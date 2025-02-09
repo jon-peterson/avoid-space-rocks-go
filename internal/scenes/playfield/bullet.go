@@ -4,14 +4,13 @@ import (
 	"avoid_the_space_rocks/internal/gameobjects"
 	"avoid_the_space_rocks/internal/utils"
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"time"
 )
 
 type Bullet struct {
 	gameobjects.Rigidbody
 	gameobjects.SpriteSheet
-	isAlive bool
-	born    time.Time
+	isAlive    bool
+	lifetimeMs uint16
 }
 
 var _ gameobjects.Collidable = (*Bullet)(nil)
@@ -29,8 +28,8 @@ func NewBullet(position, velocity rl.Vector2) Bullet {
 				Position: position,
 			},
 		},
-		isAlive: true,
-		born:    time.Now(),
+		isAlive:    true,
+		lifetimeMs: 0,
 	}
 	return bullet
 }
@@ -40,6 +39,7 @@ func (b *Bullet) Update() error {
 	game := GetGame()
 	b.Rigidbody.ApplyPhysics()
 	b.Position = game.World.Wraparound(b.Position)
+	b.lifetimeMs += uint16(rl.GetFrameTime() * 1000)
 	return nil
 }
 
@@ -50,7 +50,7 @@ func (b *Bullet) Draw() error {
 
 // IsAlive returns true if the bullet is still alive. Always dead after its lifetime.
 func (b *Bullet) IsAlive() bool {
-	return b.isAlive && time.Since(b.born).Milliseconds() < bulletLifetimeMs
+	return b.isAlive && b.lifetimeMs < bulletLifetimeMs
 }
 
 // GetHitbox returns the hitbox of the bullet, used for basic collision detection.
