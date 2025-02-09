@@ -1,25 +1,25 @@
-package random
+package utils
 
 import "math/rand"
 
-// Float32 returns a random float32 between 0 and max. Panics if <= 0.
-func Float32(max float32) float32 {
+// RndFloat32 returns a random float32 between 0 and max. Panics if <= 0.
+func RndFloat32(max float32) float32 {
 	if max <= 0 {
 		panic("max must be greater than 0")
 	}
 	return rand.Float32() * max
 }
 
-// Float32InRange returns a random float32 between min and max. Panics if min >= max.
-func Float32InRange(min, max float32) float32 {
+// RndFloat32InRange returns a random float32 between min and max. Panics if min >= max.
+func RndFloat32InRange(min, max float32) float32 {
 	if min >= max {
 		panic("min must be less than max")
 	}
 	return min + rand.Float32()*(max-min)
 }
 
-// Int32InRange returns a random int32 between min and max. Panics if min >= max.
-func Int32InRange(min, max int32) int32 {
+// RndInt32InRange returns a random int32 between min and max. Panics if min >= max.
+func RndInt32InRange(min, max int32) int32 {
 	if min >= max {
 		panic("min must be less than max")
 	}

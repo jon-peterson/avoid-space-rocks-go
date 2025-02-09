@@ -29,18 +29,18 @@ func NewRockBig() Rock {
 				Rotation: rl.Vector2{X: 1, Y: 0},
 			},
 		},
-		rotationSpeed: random.Float32(rockMaxRotate) / 4,
+		rotationSpeed: utils.RndFloat32(rockMaxRotate) / 4,
 		isAlive:       true,
 	}
 	// Half of 'em rotate counterclockwise
-	if random.Chance(0.5) {
+	if utils.Chance(0.5) {
 		rock.rotationSpeed = -rock.rotationSpeed
 	}
 	// Randomize the speed and direction
 	rock.MaxVelocity = rockMaxSpeed / 4
 	rock.Velocity = rl.Vector2{
-		X: random.Float32InRange(-rock.MaxVelocity, rock.MaxVelocity),
-		Y: random.Float32InRange(-rock.MaxVelocity, rock.MaxVelocity),
+		X: utils.RndFloat32InRange(-rock.MaxVelocity, rock.MaxVelocity),
+		Y: utils.RndFloat32InRange(-rock.MaxVelocity, rock.MaxVelocity),
 	}
 	return rock
 }

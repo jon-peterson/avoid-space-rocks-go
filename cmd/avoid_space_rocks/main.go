@@ -15,6 +15,7 @@ func main() {
 	defer rl.CloseWindow()
 
 	rl.SetTargetFPS(60)
+	rl.SetExitKey(rl.KeyNull)
 
 	// For now there's only one screen
 	game := playfield.InitGame(screenWidth, screenHeight)

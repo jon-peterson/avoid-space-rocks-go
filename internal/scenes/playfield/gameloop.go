@@ -1,6 +1,9 @@
 package playfield
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	"avoid_the_space_rocks/internal/utils"
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
 
 func GameLoop() {
 
@@ -23,16 +26,21 @@ func handleInput() {
 	if rl.IsKeyPressed(rl.KeySpace) {
 		spaceship.Fire()
 	}
+	if rl.IsKeyPressed(rl.KeyEscape) {
+		GetGame().Paused = !GetGame().Paused
+	}
 	spaceship.FuelBurning = rl.IsKeyDown(rl.KeyUp)
 }
 
 // Update all game state since last time through game loop
 func update() {
 	game := GetGame()
-	if err := game.World.Spaceship.Update(); err != nil {
-		rl.TraceLog(rl.LogError, "error updating spaceship: %v", err)
+	if !game.Paused {
+		if err := game.World.Spaceship.Update(); err != nil {
+			rl.TraceLog(rl.LogError, "error updating spaceship: %v", err)
+		}
+		game.World.Objects.Update()
 	}
-	game.World.Objects.Update()
 }
 
 // Draw all game state
@@ -40,9 +48,15 @@ func render() {
 	game := GetGame()
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.RayWhite)
+
 	if err := game.World.Spaceship.Draw(); err != nil {
 		rl.TraceLog(rl.LogError, "error drawing spaceship: %v", err)
 	}
 	game.World.Objects.Draw()
+
+	if game.Paused {
+		utils.CenterText("PAUSED", rl.Vector2{X: game.World.width / 2, Y: game.World.height / 2}, 40)
+	}
+
 	rl.EndDrawing()
 }

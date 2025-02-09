@@ -55,13 +55,13 @@ func (w *World) Wraparound(p rl.Vector2) rl.Vector2 {
 func (w *World) RandomBorderLocation() rl.Vector2 {
 	if random.Chance(0.5) {
 		return rl.Vector2{
-			X: random.Float32(w.width),
+			X: random.RndFloat32(w.width),
 			Y: random.Choice([]float32{0, w.height}),
 		}
 	}
 	return rl.Vector2{
 		X: random.Choice([]float32{0, w.width}),
-		Y: random.Float32(w.height),
+		Y: random.RndFloat32(w.height),
 	}
 
 }

@@ -24,10 +24,11 @@ const (
 )
 
 type Game struct {
-	World World
-	Lives uint8
-	Level uint8
-	Score uint64
+	World  World
+	Lives  uint8
+	Level  uint8
+	Score  uint64
+	Paused bool
 }
 
 func GetGame() *Game {
