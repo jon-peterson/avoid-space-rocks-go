@@ -6,38 +6,55 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+type RockSize int
+
+const (
+	RockBig RockSize = iota
+	RockMedium
+	RockSmall
+	RockTiny
+)
+
+// Create a constant array of four string elements
+var rockSpriteFile = []string{
+	"rock_big.png",
+	"rock_medium.png",
+	"rock_small.png",
+	"rock_tiny.png",
+}
+
 // Rock is a game object that has a consistent rotation speed and constant velocity.
 type Rock struct {
 	gameobjects.Rigidbody
 	gameobjects.SpriteSheet
 	rotationSpeed float32 // rotations per second
 	isAlive       bool
+	size          RockSize
 }
 
 var _ gameobjects.Collidable = (*Rock)(nil)
 var _ gameobjects.GameObject = (*Rock)(nil)
 
-// NewRockBig creates a new large rock with a random position and velocity, spinning randomly.
-func NewRockBig() Rock {
-	game := GetGame()
-	sheet, _ := gameobjects.NewSpriteSheet("rock_big.png", 1, 1)
+func NewRock(size RockSize, position rl.Vector2) Rock {
+	sheet, _ := gameobjects.NewSpriteSheet(rockSpriteFile[size], 1, 1)
 	rock := Rock{
 		SpriteSheet: sheet,
 		Rigidbody: gameobjects.Rigidbody{
 			Transform: gameobjects.Transform{
-				Position: game.World.RandomBorderLocation(),
+				Position: position,
 				Rotation: rl.Vector2{X: 1, Y: 0},
 			},
 		},
 		rotationSpeed: utils.RndFloat32(rockMaxRotate) / 4,
 		isAlive:       true,
+		size:          size,
 	}
 	// Half of 'em rotate counterclockwise
 	if utils.Chance(0.5) {
 		rock.rotationSpeed = -rock.rotationSpeed
 	}
 	// Randomize the speed and direction
-	rock.MaxVelocity = rockMaxSpeed / 4
+	rock.MaxVelocity = rockMaxSpeed / float32(4-size)
 	rock.Velocity = rl.Vector2{
 		X: utils.RndFloat32InRange(-rock.MaxVelocity, rock.MaxVelocity),
 		Y: utils.RndFloat32InRange(-rock.MaxVelocity, rock.MaxVelocity),

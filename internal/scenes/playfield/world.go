@@ -32,7 +32,7 @@ func (w *World) InitializeLevel(level int) {
 	}
 	// Random rocks based on the level number
 	for i := 0; i < 4; i++ {
-		rock := NewRockBig()
+		rock := NewRock(RockBig, w.RandomBorderLocation())
 		w.Objects.Add(&rock)
 	}
 }

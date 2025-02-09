@@ -40,7 +40,7 @@ func TestBullet_GetHitbox(t *testing.T) {
 
 func TestBullet_OnCollision(t *testing.T) {
 	bullet := NewBullet(rl.NewVector2(0, 0), rl.NewVector2(0, 0))
-	rock := NewRockBig()
+	rock := NewRock(RockBig, rl.NewVector2(0, 0))
 	err := bullet.OnCollision(&rock)
 	if err != nil {
 		t.Errorf("Unexpected error during collision: %v", err)
