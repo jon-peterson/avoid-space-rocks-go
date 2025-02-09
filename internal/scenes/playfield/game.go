@@ -19,6 +19,9 @@ const (
 	bulletMaxSpeed   float32 = 20.0 // units per second
 	bulletLifetimeMs uint16  = 1000
 
+	shrapnelMaxSpeed  float32 = 6.0          // units per second
+	shrapnelMaxRotate float32 = math.Pi * 12 // 6 rotations per second
+
 	rockMaxSpeed  float32 = 10.0
 	rockMaxRotate float32 = math.Pi * 6 // 3 rotations per second
 )

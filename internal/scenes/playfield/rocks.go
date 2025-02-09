@@ -92,3 +92,25 @@ func (r *Rock) OnCollision(other gameobjects.Collidable) error {
 	// TODO: Check for collision with the spaceship
 	return nil
 }
+
+// OnDestruction handles the destruction of the rock, spawning smaller rocks if applicable.
+func (r *Rock) OnDestruction(bulletVelocity rl.Vector2) error {
+	game := GetGame()
+	r.isAlive = false
+	// So long as it isn't a tiny rock, spawn more smaller rocks at same loc
+	if r.size > RockTiny {
+		for range utils.RndInt32InRange(2, 4) {
+			// Spawn a new rock at the same position as the old one but a bit back
+			newRock := NewRock(r.size-1, rl.Vector2Add(r.Position, bulletVelocity))
+			game.World.Objects.Add(&newRock)
+			// Add a bit of bullet velocity to each new rock so more likely moving away
+			newRock.Velocity = rl.Vector2Add(newRock.Velocity, rl.Vector2Scale(bulletVelocity, 0.1))
+		}
+	}
+	// Spawn shrapnel in random directions and lifespans
+	for range utils.RndInt32InRange(3, 6) {
+		shrapnel := NewShrapnel(r.Position, uint16(utils.RndInt32InRange(300, 600)))
+		game.World.Objects.Add(&shrapnel)
+	}
+	return nil
+}

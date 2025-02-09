@@ -14,7 +14,7 @@ func TestBullet_IsAlive(t *testing.T) {
 	}
 
 	// Test that the bullet is not alive after its lifetime has passed
-	bullet.lifetimeMs = bulletLifetimeMs + 1
+	bullet.ageMs = bulletLifetimeMs + 1
 	if bullet.IsAlive() {
 		t.Errorf("Expected bullet to be dead after its lifetime has passed")
 	}
