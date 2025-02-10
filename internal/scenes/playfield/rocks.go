@@ -108,7 +108,7 @@ func (r *Rock) OnDestruction(bulletVelocity rl.Vector2) error {
 		}
 	}
 	// Spawn shrapnel in random directions and lifespans
-	for range utils.RndInt32InRange(3, 6) {
+	for range utils.RndInt32InRange(5, 10) {
 		shrapnel := NewShrapnel(r.Position, uint16(utils.RndInt32InRange(300, 600)))
 		game.World.Objects.Add(&shrapnel)
 	}
