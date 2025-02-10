@@ -3,6 +3,7 @@ package playfield
 import (
 	"avoid_the_space_rocks/internal/utils"
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"strconv"
 )
 
 func GameLoop() {
@@ -54,9 +55,16 @@ func render() {
 	}
 	game.World.Objects.Draw()
 
+	drawHud()
+
 	if game.Paused {
 		utils.CenterText("PAUSED", rl.Vector2{X: game.World.width / 2, Y: game.World.height / 3}, 40)
 	}
 
 	rl.EndDrawing()
+}
+
+func drawHud() {
+	game := GetGame()
+	utils.WriteText(strconv.FormatUint(game.Score, 10), rl.Vector2{X: 10, Y: 10}, 20)
 }
