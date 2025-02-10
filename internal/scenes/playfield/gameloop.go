@@ -49,13 +49,12 @@ func render() {
 	game := GetGame()
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.RayWhite)
+	drawHud()
 
 	if err := game.World.Spaceship.Draw(); err != nil {
 		rl.TraceLog(rl.LogError, "error drawing spaceship: %v", err)
 	}
 	game.World.Objects.Draw()
-
-	drawHud()
 
 	if game.Paused {
 		utils.CenterText("PAUSED", rl.Vector2{X: game.World.width / 2, Y: game.World.height / 3}, 40)
@@ -64,7 +63,15 @@ func render() {
 	rl.EndDrawing()
 }
 
+// drawHud displays the score and the number of lives remaining
 func drawHud() {
 	game := GetGame()
 	utils.WriteText(strconv.FormatUint(game.Score, 10), rl.Vector2{X: 10, Y: 10}, 20)
+	size := game.World.Spaceship.SpriteSheet.GetSize()
+	for i := range game.Lives {
+		pos := rl.Vector2{X: game.World.width - 20 - (float32(i) * size.X * 0.6), Y: 20 + (size.Y / 2)}
+		if err := game.World.Spaceship.SpriteSheet.Draw(0, 0, pos, rl.Vector2{X: 0, Y: -1}); err != nil {
+			rl.TraceLog(rl.LogError, "error drawing spaceship for lives: %v", err)
+		}
+	}
 }

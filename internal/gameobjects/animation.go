@@ -72,6 +72,14 @@ func (s *SpriteSheet) frame(row, col int) (rl.Rectangle, error) {
 	}, nil
 }
 
+// GetSize returns the size of the sprite in pixels as a vector
+func (s *SpriteSheet) GetSize() rl.Vector2 {
+	return rl.Vector2{
+		X: float32(s.frameWidth),
+		Y: float32(s.frameHeight),
+	}
+}
+
 // GetRectangle returns the bounding rectangle where this sprite will be drawn centered at center
 func (s *SpriteSheet) GetRectangle(center rl.Vector2) rl.Rectangle {
 	return rl.Rectangle{

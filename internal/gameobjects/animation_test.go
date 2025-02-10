@@ -72,3 +72,15 @@ func TestSpriteSheet_GetRectangle(t *testing.T) {
 		t.Errorf("Expected rectangle %v, got %v", expected, rect)
 	}
 }
+
+func TestSpriteSheet_GetSize(t *testing.T) {
+	sheet, err := NewSpriteSheet("test.png", 2, 2)
+	if err != nil {
+		t.Fatalf("Failed to create SpriteSheet: %v", err)
+	}
+
+	expected := rl.Vector2{X: float32(sheet.frameWidth), Y: float32(sheet.frameHeight)}
+	if sheet.GetSize() != expected {
+		t.Errorf("Expected size %v, got %v", expected, sheet.GetSize())
+	}
+}
