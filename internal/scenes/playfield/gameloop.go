@@ -55,7 +55,7 @@ func render() {
 	game.World.Objects.Draw()
 
 	if game.Paused {
-		utils.CenterText("PAUSED", rl.Vector2{X: game.World.width / 2, Y: game.World.height / 2}, 40)
+		utils.CenterText("PAUSED", rl.Vector2{X: game.World.width / 2, Y: game.World.height / 3}, 40)
 	}
 
 	rl.EndDrawing()
