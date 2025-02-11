@@ -1,4 +1,4 @@
-package playfield
+package core
 
 import (
 	"os"
@@ -26,12 +26,12 @@ func TestInitGame(t *testing.T) {
 		t.Errorf("Expected Score to be 0, got %d", game.Score)
 	}
 
-	if game.World.width != 800 {
-		t.Errorf("Expected World width to be 800, got %f", game.World.width)
+	if game.World.Width != 800 {
+		t.Errorf("Expected World width to be 800, got %f", game.World.Width)
 	}
 
-	if game.World.height != 600 {
-		t.Errorf("Expected World height to be 600, got %f", game.World.height)
+	if game.World.Height != 600 {
+		t.Errorf("Expected World height to be 600, got %f", game.World.Height)
 	}
 }
 

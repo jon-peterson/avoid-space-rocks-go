@@ -1,4 +1,4 @@
-package playfield
+package core
 
 import (
 	"avoid_the_space_rocks/internal/gameobjects"

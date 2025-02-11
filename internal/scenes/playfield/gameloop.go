@@ -1,6 +1,7 @@
 package playfield
 
 import (
+	"avoid_the_space_rocks/internal/core"
 	"avoid_the_space_rocks/internal/utils"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"strconv"
@@ -17,7 +18,7 @@ func GameLoop() {
 
 // Handle player input
 func handleInput() {
-	spaceship := &GetGame().World.Spaceship
+	spaceship := &core.GetGame().World.Spaceship
 	if rl.IsKeyDown(rl.KeyLeft) {
 		spaceship.RotateLeft()
 	}
@@ -28,14 +29,14 @@ func handleInput() {
 		spaceship.Fire()
 	}
 	if rl.IsKeyPressed(rl.KeyEscape) {
-		GetGame().Paused = !GetGame().Paused
+		core.GetGame().Paused = !core.GetGame().Paused
 	}
 	spaceship.FuelBurning = rl.IsKeyDown(rl.KeyUp)
 }
 
 // Update all game state since last time through game loop
 func update() {
-	game := GetGame()
+	game := core.GetGame()
 	if !game.Paused {
 		if err := game.World.Spaceship.Update(); err != nil {
 			rl.TraceLog(rl.LogError, "error updating spaceship: %v", err)
@@ -46,7 +47,7 @@ func update() {
 
 // Draw all game state
 func render() {
-	game := GetGame()
+	game := core.GetGame()
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.RayWhite)
 	drawHud()
@@ -57,7 +58,7 @@ func render() {
 	game.World.Objects.Draw()
 
 	if game.Paused {
-		utils.CenterText("PAUSED", rl.Vector2{X: game.World.width / 2, Y: game.World.height / 3}, 40)
+		utils.CenterText("PAUSED", rl.Vector2{X: game.World.Width / 2, Y: game.World.Height / 3}, 40)
 	}
 
 	rl.EndDrawing()
@@ -65,11 +66,11 @@ func render() {
 
 // drawHud displays the score and the number of lives remaining
 func drawHud() {
-	game := GetGame()
+	game := core.GetGame()
 	utils.WriteText(strconv.FormatUint(game.Score, 10), rl.Vector2{X: 10, Y: 10}, 20)
 	size := game.World.Spaceship.SpriteSheet.GetSize()
 	for i := range game.Lives {
-		pos := rl.Vector2{X: game.World.width - 20 - (float32(i) * size.X * 0.6), Y: 20 + (size.Y / 2)}
+		pos := rl.Vector2{X: game.World.Width - 20 - (float32(i) * size.X * 0.6), Y: 20 + (size.Y / 2)}
 		if err := game.World.Spaceship.SpriteSheet.Draw(0, 0, pos, rl.Vector2{X: 0, Y: -1}); err != nil {
 			rl.TraceLog(rl.LogError, "error drawing spaceship for lives: %v", err)
 		}

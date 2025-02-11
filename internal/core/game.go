@@ -1,4 +1,4 @@
-package playfield
+package core
 
 import (
 	"math"
