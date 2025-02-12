@@ -1,6 +1,7 @@
 package core
 
 import (
+	evbus "github.com/asaskevich/EventBus"
 	"math"
 	"sync"
 )
@@ -27,11 +28,15 @@ const (
 )
 
 type Game struct {
-	World  World
-	Lives  uint8
-	Level  uint8
-	Score  uint64
+	World World
+
+	Lives uint8
+	Level uint8
+	Score uint64
+
 	Paused bool
+
+	EventBus evbus.Bus
 }
 
 func GetGame() *Game {
@@ -45,10 +50,12 @@ func InitGame(screenWidth, screenHeight int32) *Game {
 	once.Do(func() {
 		w := NewWorld(screenWidth, screenHeight)
 		instance = &Game{
-			World: w,
-			Lives: 3,
-			Level: 1,
-			Score: 0,
+			World:    w,
+			Lives:    3,
+			Level:    1,
+			Score:    0,
+			Paused:   false,
+			EventBus: evbus.New(),
 		}
 	})
 	return instance

@@ -94,6 +94,7 @@ func (r *Rock) OnCollision(other gameobjects.Collidable) error {
 }
 
 // OnDestruction handles the destruction of the rock, spawning smaller rocks if applicable.
+// This is called by the bullet's OnCollision method when it hits this rock.
 func (r *Rock) OnDestruction(bulletVelocity rl.Vector2) error {
 	game := GetGame()
 	r.isAlive = false
@@ -112,5 +113,8 @@ func (r *Rock) OnDestruction(bulletVelocity rl.Vector2) error {
 		shrapnel := NewShrapnel(r.Position, uint16(utils.RndInt32InRange(300, 600)))
 		game.World.Objects.Add(&shrapnel)
 	}
+	// Notify other services
+	game.EventBus.Publish("rock:destroyed", r.size)
+
 	return nil
 }

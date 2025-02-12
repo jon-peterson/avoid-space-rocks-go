@@ -18,8 +18,11 @@ func main() {
 	rl.SetTargetFPS(60)
 	rl.SetExitKey(rl.KeyNull)
 
-	// For now there's only one screen
+	// For now there's only one screen, jump right into it
 	game := core.InitGame(screenWidth, screenHeight)
 	game.World.InitializeLevel(1)
+
+	playfield.RegisterScoreKeeper(game)
 	playfield.GameLoop()
+	playfield.DeregisterScoreKeeper(game)
 }
