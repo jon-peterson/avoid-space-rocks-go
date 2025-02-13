@@ -3,8 +3,8 @@ package playfield
 import (
 	"avoid_the_space_rocks/internal/core"
 	"avoid_the_space_rocks/internal/utils"
+	"github.com/dustin/go-humanize"
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"strconv"
 )
 
 func GameLoop() {
@@ -67,7 +67,10 @@ func render() {
 // drawHud displays the score and the number of lives remaining
 func drawHud() {
 	game := core.GetGame()
-	utils.WriteText(strconv.FormatUint(game.Score, 10), rl.Vector2{X: 10, Y: 10}, 20)
+
+	score := humanize.Comma(int64(game.Score))
+	utils.WriteText(score, rl.Vector2{X: 10, Y: 10}, 30)
+
 	size := game.World.Spaceship.SpriteSheet.GetSize()
 	for i := range game.Lives {
 		pos := rl.Vector2{X: game.World.Width - 20 - (float32(i) * size.X * 0.6), Y: 20 + (size.Y / 2)}
