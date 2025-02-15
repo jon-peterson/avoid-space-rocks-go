@@ -12,7 +12,7 @@ func InitGameLoop(game *core.Game) {
 
 	for _, obs := range game.Observers {
 		if err := obs.Register(game); err != nil {
-			rl.TraceLog(rl.LogError, "error deregistering observer: %v", err)
+			rl.TraceLog(rl.LogError, "error registering observer: %v", err)
 		}
 	}
 }
