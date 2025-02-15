@@ -18,9 +18,9 @@ var _ gameobjects.GameObject = (*Shrapnel)(nil)
 
 // NewShrapnel creates a new piece of shrapnel with random direction and lifetime
 func NewShrapnel(position rl.Vector2, lifespan uint16) Shrapnel {
-	sheet, _ := gameobjects.NewSpriteSheet("shrapnel.png", 1, 1)
+	sheet, _ := gameobjects.LoadSpriteSheet("shrapnel.png", 1, 1)
 	shrapnel := Shrapnel{
-		SpriteSheet: sheet,
+		SpriteSheet: *sheet,
 		Rigidbody: gameobjects.Rigidbody{
 			Velocity: rl.Vector2{
 				X: utils.RndFloat32InRange(-shrapnelMaxSpeed, shrapnelMaxSpeed),

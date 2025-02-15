@@ -2,28 +2,19 @@ package playfield
 
 import (
 	"os"
-	"sync"
 	"testing"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-var audioManager *AudioManager
-
 func TestMain(m *testing.M) {
 	rl.InitAudioDevice()
 	defer rl.CloseAudioDevice()
-
-	// Initialize the AudioManager
-	audioManager = NewAudioManager()
-
 	os.Exit(m.Run())
 }
 
 func TestSoundFromFile(t *testing.T) {
-	// Initialize the soundMap and mapLock
-	audioManager.soundMap = make(map[string]rl.Sound)
-	audioManager.mapLock = sync.RWMutex{}
+	audioManager := NewAudioManager()
 
 	// Test loading a sound file
 	filename := "fire.wav"
@@ -49,9 +40,7 @@ func TestSoundFromFile(t *testing.T) {
 }
 
 func TestSoundFromFile_NotExist(t *testing.T) {
-	// Initialize the soundMap and mapLock
-	audioManager.soundMap = make(map[string]rl.Sound)
-	audioManager.mapLock = sync.RWMutex{}
+	audioManager := NewAudioManager()
 
 	// Test loading a non-existent sound file
 	filename := "non_existent_file.wav"

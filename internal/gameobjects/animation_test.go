@@ -2,11 +2,19 @@ package gameobjects
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"os"
 	"testing"
 )
 
+func TestMain(m *testing.M) {
+	rl.InitWindow(800, 600, "Test")
+	defer rl.CloseWindow()
+	code := m.Run()
+	os.Exit(code)
+}
+
 func TestSpriteSheet_frame(t *testing.T) {
-	sheet, err := NewSpriteSheet("test.png", 2, 2)
+	sheet, err := LoadSpriteSheet("alien_big.png", 2, 2)
 	if err != nil {
 		t.Fatalf("Failed to create SpriteSheet: %v", err)
 	}
@@ -54,7 +62,7 @@ func TestSpriteSheet_frame(t *testing.T) {
 }
 
 func TestSpriteSheet_GetRectangle(t *testing.T) {
-	sheet, err := NewSpriteSheet("test.png", 2, 2)
+	sheet, err := LoadSpriteSheet("alien_big.png", 2, 2)
 	if err != nil {
 		t.Fatalf("Failed to create SpriteSheet: %v", err)
 	}
@@ -74,7 +82,7 @@ func TestSpriteSheet_GetRectangle(t *testing.T) {
 }
 
 func TestSpriteSheet_GetSize(t *testing.T) {
-	sheet, err := NewSpriteSheet("test.png", 2, 2)
+	sheet, err := LoadSpriteSheet("alien_big.png", 2, 2)
 	if err != nil {
 		t.Fatalf("Failed to create SpriteSheet: %v", err)
 	}
@@ -82,5 +90,24 @@ func TestSpriteSheet_GetSize(t *testing.T) {
 	expected := rl.Vector2{X: float32(sheet.frameWidth), Y: float32(sheet.frameHeight)}
 	if sheet.GetSize() != expected {
 		t.Errorf("Expected size %v, got %v", expected, sheet.GetSize())
+	}
+}
+
+func TestLoadSpriteSheet_Cache(t *testing.T) {
+	// Load the sprite sheet for the first time
+	sheet1, err := LoadSpriteSheet("alien_big.png", 2, 2)
+	if err != nil {
+		t.Fatalf("Failed to load SpriteSheet the first time: %v", err)
+	}
+
+	// Load the sprite sheet for the second time
+	sheet2, err := LoadSpriteSheet("alien_big.png", 2, 2)
+	if err != nil {
+		t.Fatalf("Failed to load SpriteSheet the second time: %v", err)
+	}
+
+	// Verify that the same pointer is returned
+	if sheet1 != sheet2 {
+		t.Errorf("Expected the same pointer, got different pointers")
 	}
 }

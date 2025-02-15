@@ -17,9 +17,9 @@ var _ gameobjects.GameObject = (*Bullet)(nil)
 
 // NewBullet creates a new bullet with a given position and velocity.
 func NewBullet(position, velocity rl.Vector2) Bullet {
-	sheet, _ := gameobjects.NewSpriteSheet("bullet.png", 1, 1)
+	sheet, _ := gameobjects.LoadSpriteSheet("bullet.png", 1, 1)
 	bullet := Bullet{
-		SpriteSheet: sheet,
+		SpriteSheet: *sheet,
 		Rigidbody: gameobjects.Rigidbody{
 			Velocity:    velocity,
 			MaxVelocity: bulletMaxSpeed,

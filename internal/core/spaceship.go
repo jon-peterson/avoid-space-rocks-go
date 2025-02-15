@@ -13,9 +13,9 @@ type Spaceship struct {
 }
 
 func NewSpaceship() Spaceship {
-	sheet, _ := gameobjects.NewSpriteSheet("spaceship.png", 3, 1)
+	sheet, _ := gameobjects.LoadSpriteSheet("spaceship.png", 3, 1)
 	ship := Spaceship{
-		SpriteSheet: sheet,
+		SpriteSheet: *sheet,
 		Rigidbody: gameobjects.Rigidbody{
 			MaxVelocity: shipMaxSpeed,
 			Transform: gameobjects.Transform{

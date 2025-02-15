@@ -36,9 +36,9 @@ var _ gameobjects.Collidable = (*Rock)(nil)
 var _ gameobjects.GameObject = (*Rock)(nil)
 
 func NewRock(size RockSize, position rl.Vector2) Rock {
-	sheet, _ := gameobjects.NewSpriteSheet(rockSpriteFile[size], 1, 1)
+	sheet, _ := gameobjects.LoadSpriteSheet(rockSpriteFile[size], 1, 1)
 	rock := Rock{
-		SpriteSheet: sheet,
+		SpriteSheet: *sheet,
 		Rigidbody: gameobjects.Rigidbody{
 			Transform: gameobjects.Transform{
 				Position: position,
@@ -88,7 +88,7 @@ func (r *Rock) GetHitbox() rl.Rectangle {
 }
 
 // OnCollision handles the collision with another Collidable object.
-func (r *Rock) OnCollision(other gameobjects.Collidable) error {
+func (r *Rock) OnCollision(_ gameobjects.Collidable) error {
 	// TODO: Check for collision with the spaceship
 	return nil
 }

@@ -8,13 +8,13 @@ import (
 )
 
 type AudioManager struct {
-	soundMap map[string]rl.Sound
+	soundMap map[string]*rl.Sound
 	mapLock  sync.RWMutex
 }
 
 func NewAudioManager() *AudioManager {
 	return &AudioManager{
-		soundMap: make(map[string]rl.Sound),
+		soundMap: make(map[string]*rl.Sound),
 	}
 }
 
@@ -74,7 +74,7 @@ func (mgr *AudioManager) soundFromFile(filename string) (*rl.Sound, error) {
 	mgr.mapLock.RLock()
 	if sound, ok := mgr.soundMap[filename]; ok {
 		mgr.mapLock.RUnlock()
-		return &sound, nil
+		return sound, nil
 	}
 	mgr.mapLock.RUnlock()
 	// Load and save the sound file so we need a writers lock
@@ -84,6 +84,6 @@ func (mgr *AudioManager) soundFromFile(filename string) (*rl.Sound, error) {
 	if sound.Stream.Buffer == nil {
 		return &sound, fmt.Errorf("could not load sound file %s", filename)
 	}
-	mgr.soundMap[filename] = sound
+	mgr.soundMap[filename] = &sound
 	return &sound, nil
 }

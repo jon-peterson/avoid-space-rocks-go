@@ -4,6 +4,7 @@ import (
 	"fmt"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"math"
+	"sync"
 )
 
 type SpriteSheet struct {
@@ -16,12 +17,35 @@ type SpriteSheet struct {
 	origin      rl.Vector2   // The middle of the sprite (for rotation)
 }
 
-func NewSpriteSheet(file string, rows, cols int32) (SpriteSheet, error) {
-	// TODO: share textures by name among all instances
-	sheetTexture := rl.LoadTexture("assets/sprites/" + file)
+type SpriteManager struct {
+	spritesMap map[string]*SpriteSheet
+	mapLock    sync.RWMutex
+}
 
+var spriteManager *SpriteManager = newSpriteManager()
+
+func newSpriteManager() *SpriteManager {
+	return &SpriteManager{
+		spritesMap: make(map[string]*SpriteSheet),
+	}
+}
+
+// LoadSpriteSheet loads a spritesheet from the given file, or returns an error if it can't.
+// It initializes it with the specified rows and columns. SpriteSheets are cached.
+func LoadSpriteSheet(file string, rows, cols int32) (*SpriteSheet, error) {
+	// Return the existing sprite sheet if it's already been loaded
+	spriteManager.mapLock.RLock()
+	if sprite, ok := spriteManager.spritesMap[file]; ok {
+		spriteManager.mapLock.RUnlock()
+		return sprite, nil
+	}
+	spriteManager.mapLock.RUnlock()
+	// Create, store, and return the spritesheet at that file
+	spriteManager.mapLock.Lock()
+	defer spriteManager.mapLock.Unlock()
+	sheetTexture := rl.LoadTexture("assets/sprites/" + file)
 	if sheetTexture.Width%cols != 0 || sheetTexture.Height%cols != 0 {
-		return SpriteSheet{},
+		return &SpriteSheet{},
 			fmt.Errorf("spritesheet of dimensions (%d,%d) can't be broken into %d rows and %d cols",
 				sheetTexture.Width, sheetTexture.Height, rows, cols)
 	}
@@ -35,7 +59,8 @@ func NewSpriteSheet(file string, rows, cols int32) (SpriteSheet, error) {
 		cols:        cols,
 	}
 	s.origin = rl.NewVector2(float32(s.frameWidth)/2, float32(s.frameHeight)/2)
-	return s, nil
+	spriteManager.spritesMap[file] = &s
+	return &s, nil
 }
 
 func (s *SpriteSheet) String() string {
