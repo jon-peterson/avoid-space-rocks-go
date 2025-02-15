@@ -24,12 +24,12 @@ func DeregisterScoreKeeper(game *core.Game) error {
 func RockScoreHandler(size core.RockSize) {
 	switch size {
 	case core.RockTiny:
-		core.GetGame().Score += 25
-	case core.RockSmall:
-		core.GetGame().Score += 50
-	case core.RockMedium:
 		core.GetGame().Score += 100
+	case core.RockSmall:
+		core.GetGame().Score += 75
+	case core.RockMedium:
+		core.GetGame().Score += 50
 	case core.RockBig:
-		core.GetGame().Score += 250
+		core.GetGame().Score += 20
 	}
 }

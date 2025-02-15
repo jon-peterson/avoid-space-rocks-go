@@ -14,6 +14,8 @@ const (
 func main() {
 	rl.InitWindow(screenWidth, screenHeight, "Avoid the Space Rocks")
 	defer rl.CloseWindow()
+	rl.InitAudioDevice()
+	defer rl.CloseAudioDevice()
 
 	rl.SetTargetFPS(60)
 	rl.SetExitKey(rl.KeyNull)
@@ -21,8 +23,7 @@ func main() {
 	// For now there's only one screen, jump right into it
 	game := core.InitGame(screenWidth, screenHeight)
 	game.World.InitializeLevel(1)
-
-	playfield.RegisterScoreKeeper(game)
+	playfield.InitGameLoop(game)
 	playfield.GameLoop()
-	playfield.DeregisterScoreKeeper(game)
+	playfield.CloseGameLoop(game)
 }
