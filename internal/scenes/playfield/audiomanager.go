@@ -17,12 +17,20 @@ func RegisterAudioManager(game *core.Game) error {
 		rl.TraceLog(rl.LogError, "error subscribing to rock:destroyed event: %v", err)
 		return err
 	}
+	if err := game.EventBus.Subscribe("spaceship:fire", SpaceshipFireHandler); err != nil {
+		rl.TraceLog(rl.LogError, "error subscribing to spaceship:fire event: %v", err)
+		return err
+	}
 	return nil
 }
 
 func DeregisterAudioManager(game *core.Game) error {
 	if err := game.EventBus.Unsubscribe("rock:destroyed", RockExplosionHandler); err != nil {
 		rl.TraceLog(rl.LogError, "error unsubscribing from rock:destroyed event: %v", err)
+		return err
+	}
+	if err := game.EventBus.Unsubscribe("spaceship:fire", SpaceshipFireHandler); err != nil {
+		rl.TraceLog(rl.LogError, "error unsubscribing from spaceship:fire event: %v", err)
 		return err
 	}
 	return nil
@@ -39,6 +47,10 @@ func RockExplosionHandler(size core.RockSize) {
 	case core.RockBig:
 		_ = playSound("explosion_large.wav")
 	}
+}
+
+func SpaceshipFireHandler() {
+	_ = playSound("fire.wav")
 }
 
 func playSound(filename string) error {

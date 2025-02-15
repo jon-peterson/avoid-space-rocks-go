@@ -66,7 +66,9 @@ func (s *Spaceship) RotateRight() {
 func (s *Spaceship) Fire() {
 	b := NewBullet(s.Position, s.Rotation)
 	b.Velocity = rl.Vector2Add(rl.Vector2Scale(s.Rotation, bulletSpeed), s.Velocity)
-	GetGame().World.Objects.Add(&b)
+	game := GetGame()
+	game.World.Objects.Add(&b)
+	game.EventBus.Publish("spaceship:fire")
 }
 
 // frameIndex returns the index of the correct frame to use in the sprite sheet. There are two
