@@ -31,14 +31,22 @@ func DeregisterAudioManager(game *core.Game) error {
 func RockExplosionHandler(size core.RockSize) {
 	switch size {
 	case core.RockTiny:
-		core.GetGame().Score += 100
+		_ = playSound("explosion_tiny.wav")
 	case core.RockSmall:
-		core.GetGame().Score += 75
+		_ = playSound("explosion_small.wav")
 	case core.RockMedium:
-		core.GetGame().Score += 50
+		_ = playSound("explosion_medium.wav")
 	case core.RockBig:
-		core.GetGame().Score += 20
+		_ = playSound("explosion_large.wav")
 	}
+}
+
+func playSound(filename string) error {
+	sound, err := soundFromFile(filename)
+	if err == nil {
+		rl.PlaySound(*sound)
+	}
+	return err
 }
 
 // soundFromFile loads a sound from a file, or returns an error if it can't.
