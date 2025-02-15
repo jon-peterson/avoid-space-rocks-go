@@ -8,13 +8,21 @@ import (
 )
 
 func InitGameLoop(game *core.Game) {
-	RegisterScoreKeeper(game)
-	RegisterAudioManager(game)
+	game.Observers = append(game.Observers, NewAudioManager(), NewScoreKeeper())
+
+	for _, obs := range game.Observers {
+		if err := obs.Register(game); err != nil {
+			rl.TraceLog(rl.LogError, "error registering observer: %v", err)
+		}
+	}
 }
 
 func CloseGameLoop(game *core.Game) {
-	DeregisterScoreKeeper(game)
-	DeregisterAudioManager(game)
+	for _, obs := range game.Observers {
+		if err := obs.Deregister(game); err != nil {
+			rl.TraceLog(rl.LogError, "error deregistering observer: %v", err)
+		}
+	}
 }
 
 func GameLoop() {

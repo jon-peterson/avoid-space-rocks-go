@@ -36,7 +36,13 @@ type Game struct {
 
 	Paused bool
 
-	EventBus evbus.Bus
+	EventBus  evbus.Bus
+	Observers []EventObserver
+}
+
+type EventObserver interface {
+	Register(game *Game) error
+	Deregister(game *Game) error
 }
 
 func GetGame() *Game {
@@ -50,12 +56,13 @@ func InitGame(screenWidth, screenHeight int32) *Game {
 	once.Do(func() {
 		w := NewWorld(screenWidth, screenHeight)
 		instance = &Game{
-			World:    w,
-			Lives:    3,
-			Level:    1,
-			Score:    0,
-			Paused:   false,
-			EventBus: evbus.New(),
+			World:     w,
+			Lives:     3,
+			Level:     1,
+			Score:     0,
+			Paused:    false,
+			EventBus:  evbus.New(),
+			Observers: make([]EventObserver, 0, 10),
 		}
 	})
 	return instance
