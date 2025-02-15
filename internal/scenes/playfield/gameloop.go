@@ -7,8 +7,17 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func GameLoop() {
+func InitGameLoop(game *core.Game) {
+	RegisterScoreKeeper(game)
+	RegisterAudioManager(game)
+}
 
+func CloseGameLoop(game *core.Game) {
+	DeregisterScoreKeeper(game)
+	DeregisterAudioManager(game)
+}
+
+func GameLoop() {
 	for !rl.WindowShouldClose() {
 		handleInput()
 		update()
