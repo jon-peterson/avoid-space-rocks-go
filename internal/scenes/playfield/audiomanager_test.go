@@ -1,26 +1,33 @@
 package playfield
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
 	"os"
 	"sync"
 	"testing"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
+
+var audioManager *AudioManager
 
 func TestMain(m *testing.M) {
 	rl.InitAudioDevice()
 	defer rl.CloseAudioDevice()
+
+	// Initialize the AudioManager
+	audioManager = NewAudioManager()
+
 	os.Exit(m.Run())
 }
 
 func TestSoundFromFile(t *testing.T) {
 	// Initialize the soundMap and mapLock
-	soundMap = make(map[string]rl.Sound)
-	mapLock = sync.RWMutex{}
+	audioManager.soundMap = make(map[string]rl.Sound)
+	audioManager.mapLock = sync.RWMutex{}
 
 	// Test loading a sound file
 	filename := "fire.wav"
-	sound, err := soundFromFile(filename)
+	sound, err := audioManager.soundFromFile(filename)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -29,26 +36,26 @@ func TestSoundFromFile(t *testing.T) {
 	}
 
 	// Test loading the same sound file from cache
-	cachedSound, err := soundFromFile(filename)
+	cachedSound, err := audioManager.soundFromFile(filename)
 	if err != nil {
-		t.Fatalf("expected no error, got %v", err)
+		t.Fatalf("expected no error loading cache, got %v", err)
 	}
 	if cachedSound.Stream.Buffer == nil {
-		t.Fatalf("expected valid sound, got nil buffer")
+		t.Fatalf("expected valid sound loading cache, got nil buffer")
 	}
-	if &sound != &cachedSound {
+	if sound != cachedSound {
 		t.Fatalf("expected cached sound, got different instance")
 	}
 }
 
 func TestSoundFromFile_NotExist(t *testing.T) {
 	// Initialize the soundMap and mapLock
-	soundMap = make(map[string]rl.Sound)
-	mapLock = sync.RWMutex{}
+	audioManager.soundMap = make(map[string]rl.Sound)
+	audioManager.mapLock = sync.RWMutex{}
 
 	// Test loading a non-existent sound file
 	filename := "non_existent_file.wav"
-	_, err := soundFromFile(filename)
+	_, err := audioManager.soundFromFile(filename)
 	if err == nil {
 		t.Fatalf("expected an error, got nil")
 	}

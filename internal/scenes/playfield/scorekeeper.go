@@ -5,23 +5,29 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func RegisterScoreKeeper(game *core.Game) error {
-	if err := game.EventBus.Subscribe("rock:destroyed", RockScoreHandler); err != nil {
+type ScoreKeeper struct{}
+
+func NewScoreKeeper() *ScoreKeeper {
+	return &ScoreKeeper{}
+}
+
+func (sk *ScoreKeeper) Register(game *core.Game) error {
+	if err := game.EventBus.Subscribe("rock:destroyed", sk.RockScoreHandler); err != nil {
 		rl.TraceLog(rl.LogError, "error subscribing to rock:destroyed event: %v", err)
 		return err
 	}
 	return nil
 }
 
-func DeregisterScoreKeeper(game *core.Game) error {
-	if err := game.EventBus.Unsubscribe("rock:destroyed", RockScoreHandler); err != nil {
+func (sk *ScoreKeeper) Deregister(game *core.Game) error {
+	if err := game.EventBus.Unsubscribe("rock:destroyed", sk.RockScoreHandler); err != nil {
 		rl.TraceLog(rl.LogError, "error unsubscribing from rock:destroyed event: %v", err)
 		return err
 	}
 	return nil
 }
 
-func RockScoreHandler(size core.RockSize) {
+func (sk *ScoreKeeper) RockScoreHandler(size core.RockSize) {
 	switch size {
 	case core.RockTiny:
 		core.GetGame().Score += 100
