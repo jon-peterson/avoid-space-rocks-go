@@ -7,7 +7,8 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func InitGameLoop(game *core.Game) {
+func InitGameLoop() {
+	game := core.GetGame()
 	game.Observers = append(game.Observers, NewAudioManager(), NewScoreKeeper())
 
 	for _, obs := range game.Observers {
@@ -17,7 +18,8 @@ func InitGameLoop(game *core.Game) {
 	}
 }
 
-func CloseGameLoop(game *core.Game) {
+func CloseGameLoop() {
+	game := core.GetGame()
 	for _, obs := range game.Observers {
 		if err := obs.Deregister(game); err != nil {
 			rl.TraceLog(rl.LogError, "error deregistering observer: %v", err)
