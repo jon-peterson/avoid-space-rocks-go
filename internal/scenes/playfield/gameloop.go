@@ -88,7 +88,7 @@ func drawHud() {
 	game := core.GetGame()
 
 	score := humanize.Comma(int64(game.Score))
-	utils.WriteText(score, rl.Vector2{X: 10, Y: 10}, 30)
+	utils.WriteText(score, rl.Vector2{X: 15, Y: 12}, 36)
 
 	size := game.World.Spaceship.SpriteSheet.GetSize()
 	for i := range game.Lives {
