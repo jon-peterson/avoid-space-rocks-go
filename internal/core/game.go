@@ -33,8 +33,8 @@ const (
 type Game struct {
 	World *World
 
-	Lives uint8
-	Level uint8
+	Lives int32
+	Level int32
 	Score uint64
 
 	Paused bool

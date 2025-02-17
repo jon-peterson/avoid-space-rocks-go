@@ -99,8 +99,8 @@ func (r *Rock) OnDestruction(bulletVelocity rl.Vector2) error {
 	game := GetGame()
 	r.isAlive = false
 	// So long as it isn't a tiny rock, spawn more smaller rocks at same loc
-	if r.size > RockTiny {
-		for range utils.RndInt32InRange(2, 4) {
+	if int32(r.size) > (game.Level - 2 + utils.RndInt32InRange(2, 4)) {
+		for range utils.RndInt32InRange(2, max(3, int32(game.Level/2))) {
 			// Spawn a new rock at the same position as the old one but a bit back
 			newRock := NewRock(r.size-1, rl.Vector2Add(r.Position, bulletVelocity))
 			game.World.Objects.Add(&newRock)
