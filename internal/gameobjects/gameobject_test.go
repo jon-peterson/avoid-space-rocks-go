@@ -118,3 +118,27 @@ func TestGameObjectCollectionAny(t *testing.T) {
 		t.Errorf("Should not have found Perry Como")
 	}
 }
+
+func TestGameObjectCollectionForEach(t *testing.T) {
+	collection := NewGameObjectCollection()
+
+	// Add some mock objects
+	collection.Add(&MockGameObject{alive: true})
+	collection.Add(&MockGameObject{alive: false})
+	collection.Add(&MockGameObject{alive: true})
+	collection.Add(&MockGameObject{alive: false})
+	collection.Update()
+
+	collection.ForEach(func(obj GameObject) {
+		if mockObj, ok := obj.(*MockGameObject); ok {
+			mockObj.alive = false
+		}
+	})
+
+	// Test case: Check if any object is alive
+	if collection.Any(func(obj GameObject) bool {
+		return obj.IsAlive()
+	}) {
+		t.Errorf("Expected all dead objects")
+	}
+}

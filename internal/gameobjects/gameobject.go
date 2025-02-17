@@ -67,6 +67,16 @@ func (c *GameObjectCollection) Any(predicate func(GameObject) bool) bool {
 	return false
 }
 
+// ForEach calls the action on each object in the collection.
+func (c *GameObjectCollection) ForEach(action func(GameObject)) {
+	c.objectsLock.RLock()
+	defer c.objectsLock.RUnlock()
+
+	for _, obj := range c.objects {
+		action(obj)
+	}
+}
+
 // Draw all the objects in the collection.
 func (c *GameObjectCollection) Draw() {
 	c.objectsLock.RLock()
