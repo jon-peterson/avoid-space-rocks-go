@@ -30,37 +30,47 @@ func newSpriteManager() *SpriteManager {
 	}
 }
 
-// LoadSpriteSheet loads a spritesheet from the given file, or returns an error if it can't.
-// It initializes it with the specified rows and columns. SpriteSheets are cached.
-func LoadSpriteSheet(file string, rows, cols int32) (*SpriteSheet, error) {
-	// Return the existing sprite sheet if it's already been loaded
+// LoadSpriteSheet creates a new spritesheet from the given file, with deferred loading of
+// the actual texture. These are cached for performance.
+func LoadSpriteSheet(file string, rows, cols int32) *SpriteSheet {
 	spriteManager.mapLock.RLock()
 	if sprite, ok := spriteManager.spritesMap[file]; ok {
 		spriteManager.mapLock.RUnlock()
-		return sprite, nil
+		return sprite
 	}
+	// First time being asked for this spritesheet, so we need to create cache and return
 	spriteManager.mapLock.RUnlock()
-	// Create, store, and return the spritesheet at that file
 	spriteManager.mapLock.Lock()
 	defer spriteManager.mapLock.Unlock()
-	sheetTexture := rl.LoadTexture("assets/sprites/" + file)
-	if sheetTexture.Width%cols != 0 || sheetTexture.Height%cols != 0 {
-		return &SpriteSheet{},
-			fmt.Errorf("spritesheet of dimensions (%d,%d) can't be broken into %d rows and %d cols",
-				sheetTexture.Width, sheetTexture.Height, rows, cols)
-	}
-
 	s := SpriteSheet{
-		name:        file,
-		texture:     sheetTexture,
-		frameWidth:  sheetTexture.Width / cols,
-		frameHeight: sheetTexture.Height / rows,
-		rows:        rows,
-		cols:        cols,
+		name: file,
+		rows: rows,
+		cols: cols,
 	}
-	s.origin = rl.NewVector2(float32(s.frameWidth)/2, float32(s.frameHeight)/2)
 	spriteManager.spritesMap[file] = &s
-	return &s, nil
+	return &s
+}
+
+// populateTexture loads a spritesheet from the saved filename, or returns an error if it can't.
+// It initializes it with the specified rows and columns. SpriteSheets are cached.
+func (s *SpriteSheet) populateTexture() error {
+	spriteManager.mapLock.Lock()
+	defer spriteManager.mapLock.Unlock()
+	if s.frameWidth != 0 {
+		// Already loaded; just return
+		return nil
+	}
+	sheetTexture := rl.LoadTexture("assets/sprites/" + s.name)
+	if sheetTexture.Width%s.cols != 0 || sheetTexture.Height%s.rows != 0 {
+		return fmt.Errorf("spritesheet of dimensions (%d,%d) can't be broken into %d rows and %d cols",
+			sheetTexture.Width, sheetTexture.Height, s.rows, s.cols)
+	}
+	s.texture = sheetTexture
+	s.frameWidth = sheetTexture.Width / s.cols
+	s.frameHeight = sheetTexture.Height / s.rows
+	s.origin = rl.NewVector2(float32(s.frameWidth)/2, float32(s.frameHeight)/2)
+	spriteManager.spritesMap[s.name] = s
+	return nil
 }
 
 func (s *SpriteSheet) String() string {
@@ -69,6 +79,12 @@ func (s *SpriteSheet) String() string {
 
 // Draw the sprite at the given frame at the given location and rotation
 func (s *SpriteSheet) Draw(frameRow, frameCol int, loc, rot rl.Vector2) error {
+	if s.frameWidth == 0 {
+		// Texture hasn't been loaded yet, so load it now
+		if err := s.populateTexture(); err != nil {
+			return err
+		}
+	}
 	frame, err := s.frame(frameRow, frameCol)
 	if err != nil {
 		return err

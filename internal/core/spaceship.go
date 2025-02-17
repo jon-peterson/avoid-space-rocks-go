@@ -8,14 +8,14 @@ import (
 
 type Spaceship struct {
 	gameobjects.Rigidbody
-	gameobjects.SpriteSheet
+	Spritesheet *gameobjects.SpriteSheet
 	FuelBurning bool // Is the user burning fuel to accelerate?
 }
 
 func NewSpaceship() Spaceship {
-	sheet, _ := gameobjects.LoadSpriteSheet("spaceship.png", 3, 1)
+	sheet := gameobjects.LoadSpriteSheet("spaceship.png", 3, 1)
 	ship := Spaceship{
-		SpriteSheet: *sheet,
+		Spritesheet: sheet,
 		Rigidbody: gameobjects.Rigidbody{
 			MaxVelocity: shipMaxSpeed,
 			Transform: gameobjects.Transform{
@@ -47,7 +47,7 @@ func (s *Spaceship) Update() error {
 // Draw the spaceship at its current position and rotation
 func (s *Spaceship) Draw() error {
 	frame := s.frameIndex()
-	return s.SpriteSheet.Draw(frame, 0, s.Position, s.Rotation)
+	return s.Spritesheet.Draw(frame, 0, s.Position, s.Rotation)
 }
 
 // RotateLeft rotates the spaceship to the left the standard amount

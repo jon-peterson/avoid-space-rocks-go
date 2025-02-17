@@ -7,9 +7,9 @@ import (
 
 type Bullet struct {
 	gameobjects.Rigidbody
-	gameobjects.SpriteSheet
-	isAlive bool
-	ageMs   uint16
+	spritesheet *gameobjects.SpriteSheet
+	isAlive     bool
+	ageMs       uint16
 }
 
 var _ gameobjects.Collidable = (*Bullet)(nil)
@@ -17,9 +17,9 @@ var _ gameobjects.GameObject = (*Bullet)(nil)
 
 // NewBullet creates a new bullet with a given position and velocity.
 func NewBullet(position, velocity rl.Vector2) Bullet {
-	sheet, _ := gameobjects.LoadSpriteSheet("bullet.png", 1, 1)
+	sheet := gameobjects.LoadSpriteSheet("bullet.png", 1, 1)
 	bullet := Bullet{
-		SpriteSheet: *sheet,
+		spritesheet: sheet,
 		Rigidbody: gameobjects.Rigidbody{
 			Velocity:    velocity,
 			MaxVelocity: bulletMaxSpeed,
@@ -44,7 +44,7 @@ func (b *Bullet) Update() error {
 
 // Draw renders the bullet to the screen.
 func (b *Bullet) Draw() error {
-	return b.SpriteSheet.Draw(0, 0, b.Position, b.Rotation)
+	return b.spritesheet.Draw(0, 0, b.Position, b.Rotation)
 }
 
 // IsAlive returns true if the bullet is still alive. Always dead after its lifetime.

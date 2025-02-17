@@ -26,7 +26,7 @@ var rockSpriteFile = []string{
 // Rock is a game object that has a consistent rotation speed and constant velocity.
 type Rock struct {
 	gameobjects.Rigidbody
-	gameobjects.SpriteSheet
+	spritesheet   *gameobjects.SpriteSheet
 	rotationSpeed float32 // rotations per second
 	isAlive       bool
 	size          RockSize
@@ -36,9 +36,9 @@ var _ gameobjects.Collidable = (*Rock)(nil)
 var _ gameobjects.GameObject = (*Rock)(nil)
 
 func NewRock(size RockSize, position rl.Vector2) Rock {
-	sheet, _ := gameobjects.LoadSpriteSheet(rockSpriteFile[size], 1, 1)
+	sheet := gameobjects.LoadSpriteSheet(rockSpriteFile[size], 1, 1)
 	rock := Rock{
-		SpriteSheet: *sheet,
+		spritesheet: sheet,
 		Rigidbody: gameobjects.Rigidbody{
 			Transform: gameobjects.Transform{
 				Position: position,
@@ -74,7 +74,7 @@ func (r *Rock) Update() error {
 
 // Draw renders the rock to the screen.
 func (r *Rock) Draw() error {
-	return r.SpriteSheet.Draw(0, 0, r.Position, r.Rotation)
+	return r.spritesheet.Draw(0, 0, r.Position, r.Rotation)
 }
 
 // IsAlive returns whether the rock is alive or not.
@@ -84,7 +84,7 @@ func (r *Rock) IsAlive() bool {
 
 // GetHitbox returns the hitbox of the rock, used for basic collision detection.
 func (r *Rock) GetHitbox() rl.Rectangle {
-	return r.SpriteSheet.GetRectangle(r.Position)
+	return r.spritesheet.GetRectangle(r.Position)
 }
 
 // OnCollision handles the collision with another Collidable object.
