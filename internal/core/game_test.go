@@ -18,8 +18,8 @@ func TestInitGame(t *testing.T) {
 		t.Errorf("Expected Lives to be 3, got %d", game.Lives)
 	}
 
-	if game.Level != 1 {
-		t.Errorf("Expected Level to be 1, got %d", game.Level)
+	if game.Level != 0 {
+		t.Errorf("Expected Level to be 0, got %d", game.Level)
 	}
 
 	if game.Score != 0 {

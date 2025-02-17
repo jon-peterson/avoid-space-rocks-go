@@ -92,10 +92,10 @@ func drawHud() {
 	score := humanize.Comma(int64(game.Score))
 	utils.WriteText(score, rl.Vector2{X: 15, Y: 12}, 36)
 
-	size := game.World.Spaceship.SpriteSheet.GetSize()
+	size := game.World.Spaceship.Spritesheet.GetSize()
 	for i := range game.Lives {
 		pos := rl.Vector2{X: game.World.Width - 20 - (float32(i) * size.X * 0.6), Y: 20 + (size.Y / 2)}
-		if err := game.World.Spaceship.SpriteSheet.Draw(0, 0, pos, rl.Vector2{X: 0, Y: -1}); err != nil {
+		if err := game.World.Spaceship.Spritesheet.Draw(0, 0, pos, rl.Vector2{X: 0, Y: -1}); err != nil {
 			rl.TraceLog(rl.LogError, "error drawing spaceship for lives: %v", err)
 		}
 	}

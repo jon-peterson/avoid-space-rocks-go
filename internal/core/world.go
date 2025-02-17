@@ -14,26 +14,21 @@ type World struct {
 	Objects   gameobjects.GameObjectCollection
 }
 
-func NewWorld(width, height int32) World {
+func NewWorld(width, height int32) *World {
 	w := World{
 		Width:  float32(width),
 		Height: float32(height),
 	}
-	return w
+	return &w
 }
 
-func (w *World) InitializeLevel(level int) {
+func (w *World) Initialize() {
 	w.Objects = gameobjects.NewGameObjectCollection()
 	// Spaceship starts in the middle pointing up
 	w.Spaceship = NewSpaceship()
 	w.Spaceship.Position = rl.Vector2{
 		X: w.Width / 2,
 		Y: w.Height / 2,
-	}
-	// Random rocks based on the level number
-	for i := 0; i < 4; i++ {
-		rock := NewRock(RockBig, w.RandomBorderLocation())
-		w.Objects.Add(&rock)
 	}
 }
 

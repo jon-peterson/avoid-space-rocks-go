@@ -1,9 +1,12 @@
 package core
 
 import (
+	"fmt"
 	evbus "github.com/asaskevich/EventBus"
+	rl "github.com/gen2brain/raylib-go/raylib"
 	"math"
 	"sync"
+	"time"
 )
 
 var instance *Game
@@ -28,7 +31,7 @@ const (
 )
 
 type Game struct {
-	World World
+	World *World
 
 	Lives uint8
 	Level uint8
@@ -58,7 +61,7 @@ func InitGame(screenWidth, screenHeight int32) *Game {
 		instance = &Game{
 			World:     w,
 			Lives:     3,
-			Level:     1,
+			Level:     0,
 			Score:     0,
 			Paused:    false,
 			EventBus:  evbus.New(),
@@ -66,4 +69,15 @@ func InitGame(screenWidth, screenHeight int32) *Game {
 		}
 	})
 	return instance
+}
+
+// StartLevel initializes the level.
+func (g *Game) StartLevel() {
+	g.Level += 1
+	rl.TraceLog(rl.LogInfo, fmt.Sprintf("Starting level %d", g.Level))
+	time.Sleep(time.Second * 2)
+	for range g.Level + 3 {
+		rock := NewRock(RockBig, g.World.RandomBorderLocation())
+		g.World.Objects.Add(&rock)
+	}
 }
