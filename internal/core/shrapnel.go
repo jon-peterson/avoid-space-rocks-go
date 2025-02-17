@@ -68,3 +68,7 @@ func (s *Shrapnel) Draw() error {
 func (s *Shrapnel) IsAlive() bool {
 	return s.ageMs < s.lifespanMs
 }
+
+func (b *Shrapnel) IsEnemy() bool {
+	return false
+}

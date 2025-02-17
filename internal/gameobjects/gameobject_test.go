@@ -8,6 +8,7 @@ import (
 type MockGameObject struct {
 	name   string
 	alive  bool
+	enemy  bool
 	hitbox rl.Rectangle
 }
 
@@ -21,6 +22,10 @@ func (m *MockGameObject) Draw() error {
 
 func (m *MockGameObject) IsAlive() bool {
 	return m.alive
+}
+
+func (m *MockGameObject) IsEnemy() bool {
+	return m.enemy
 }
 
 func (m *MockGameObject) OnCollision(_ Collidable) error {
@@ -140,5 +145,44 @@ func TestGameObjectCollectionForEach(t *testing.T) {
 		return obj.IsAlive()
 	}) {
 		t.Errorf("Expected all dead objects")
+	}
+}
+
+func TestGameObjectCollectionHasRemainingEnemies(t *testing.T) {
+	collection := NewGameObjectCollection()
+
+	// Add some mock objects
+	collection.Add(&MockGameObject{alive: true, enemy: true})
+	collection.Add(&MockGameObject{alive: false, enemy: true})
+	collection.Add(&MockGameObject{alive: true, enemy: false})
+	collection.Add(&MockGameObject{alive: false, enemy: false})
+	collection.Update()
+
+	// Test case: Check if there are any remaining enemies
+	if !collection.HasRemainingEnemies() {
+		t.Errorf("Expected to find remaining enemies")
+	}
+
+	// Remove all enemies
+	collection.ForEach(func(obj GameObject) {
+		if mockObj, ok := obj.(*MockGameObject); ok && mockObj.enemy {
+			mockObj.alive = false
+		}
+	})
+	collection.Update()
+	if collection.HasRemainingEnemies() {
+		t.Errorf("Did not expect to find remaining enemies after marking all dead")
+	}
+
+	// Add a new non-enemy object, still should have no enemies
+	collection.Add(&MockGameObject{alive: true, enemy: false})
+	if collection.HasRemainingEnemies() {
+		t.Errorf("Newly added non-enemy should leave collection no remaining enemies")
+	}
+
+	// Add a new enemy object, now it should say true again
+	collection.Add(&MockGameObject{alive: true, enemy: true})
+	if !collection.HasRemainingEnemies() {
+		t.Errorf("Newly added enemy should leave collection with remaining enemies")
 	}
 }

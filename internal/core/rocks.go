@@ -82,6 +82,10 @@ func (r *Rock) IsAlive() bool {
 	return r.isAlive
 }
 
+func (r *Rock) IsEnemy() bool {
+	return true
+}
+
 // GetHitbox returns the hitbox of the rock, used for basic collision detection.
 func (r *Rock) GetHitbox() rl.Rectangle {
 	return r.spritesheet.GetRectangle(r.Position)

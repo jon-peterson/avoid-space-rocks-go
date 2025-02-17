@@ -52,6 +52,10 @@ func (b *Bullet) IsAlive() bool {
 	return b.isAlive && b.ageMs < bulletLifetimeMs
 }
 
+func (b *Bullet) IsEnemy() bool {
+	return false
+}
+
 // GetHitbox returns the hitbox of the bullet, used for basic collision detection.
 func (b *Bullet) GetHitbox() rl.Rectangle {
 	return rl.Rectangle{

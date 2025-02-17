@@ -9,6 +9,7 @@ type GameObject interface {
 	Update() error
 	Draw() error
 	IsAlive() bool
+	IsEnemy() bool
 }
 
 type Collidable interface {
@@ -54,6 +55,38 @@ func (c *GameObjectCollection) Update() {
 	c.collisionCheck()
 }
 
+// Draw all the objects in the collection.
+func (c *GameObjectCollection) Draw() {
+	c.objectsLock.RLock()
+	defer c.objectsLock.RUnlock()
+
+	for idx, obj := range c.objects {
+		if err := obj.Draw(); err != nil {
+			rl.TraceLog(rl.LogError, "error drawing object %d %v: %v", idx, obj, err)
+		}
+	}
+}
+
+// HasRemainingEnemies returns true if there are any enemies remaining in the collection, either
+// live in the standard set or any in the newly added set.
+func (c *GameObjectCollection) HasRemainingEnemies() bool {
+	c.objectsLock.RLock()
+	defer c.objectsLock.RUnlock()
+
+	for _, obj := range c.objects {
+		if obj.IsEnemy() && obj.IsAlive() {
+			return true
+		}
+	}
+	for _, obj := range c.newObjects {
+		if obj.IsEnemy() {
+			return true
+		}
+	}
+
+	return false
+}
+
 // Any returns true if any object in the collection matches the predicate.
 func (c *GameObjectCollection) Any(predicate func(GameObject) bool) bool {
 	c.objectsLock.RLock()
@@ -74,18 +107,6 @@ func (c *GameObjectCollection) ForEach(action func(GameObject)) {
 
 	for _, obj := range c.objects {
 		action(obj)
-	}
-}
-
-// Draw all the objects in the collection.
-func (c *GameObjectCollection) Draw() {
-	c.objectsLock.RLock()
-	defer c.objectsLock.RUnlock()
-
-	for idx, obj := range c.objects {
-		if err := obj.Draw(); err != nil {
-			rl.TraceLog(rl.LogError, "error drawing object %d %v: %v", idx, obj, err)
-		}
 	}
 }
 
