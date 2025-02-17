@@ -14,10 +14,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestSpriteSheet_frame(t *testing.T) {
-	sheet, err := LoadSpriteSheet("alien_big.png", 2, 2)
-	if err != nil {
-		t.Fatalf("Failed to create SpriteSheet: %v", err)
-	}
+	sheet := LoadSpriteSheet("alien_big.png", 2, 2)
 
 	tests := []struct {
 		row, col int
@@ -40,6 +37,7 @@ func TestSpriteSheet_frame(t *testing.T) {
 	}
 
 	// Test out of bounds
+	var err error
 	_, err = sheet.frame(-1, 0)
 	if err == nil {
 		t.Error("Expected error for out of bounds frame (-1, 0), got nil")
@@ -62,10 +60,7 @@ func TestSpriteSheet_frame(t *testing.T) {
 }
 
 func TestSpriteSheet_GetRectangle(t *testing.T) {
-	sheet, err := LoadSpriteSheet("alien_big.png", 2, 2)
-	if err != nil {
-		t.Fatalf("Failed to create SpriteSheet: %v", err)
-	}
+	sheet := LoadSpriteSheet("alien_big.png", 2, 2)
 
 	center := rl.NewVector2(50, 50)
 	expected := rl.Rectangle{
@@ -82,10 +77,7 @@ func TestSpriteSheet_GetRectangle(t *testing.T) {
 }
 
 func TestSpriteSheet_GetSize(t *testing.T) {
-	sheet, err := LoadSpriteSheet("alien_big.png", 2, 2)
-	if err != nil {
-		t.Fatalf("Failed to create SpriteSheet: %v", err)
-	}
+	sheet := LoadSpriteSheet("alien_big.png", 2, 2)
 
 	expected := rl.Vector2{X: float32(sheet.frameWidth), Y: float32(sheet.frameHeight)}
 	if sheet.GetSize() != expected {
@@ -95,16 +87,8 @@ func TestSpriteSheet_GetSize(t *testing.T) {
 
 func TestLoadSpriteSheet_Cache(t *testing.T) {
 	// Load the sprite sheet for the first time
-	sheet1, err := LoadSpriteSheet("alien_big.png", 2, 2)
-	if err != nil {
-		t.Fatalf("Failed to load SpriteSheet the first time: %v", err)
-	}
-
-	// Load the sprite sheet for the second time
-	sheet2, err := LoadSpriteSheet("alien_big.png", 2, 2)
-	if err != nil {
-		t.Fatalf("Failed to load SpriteSheet the second time: %v", err)
-	}
+	sheet1 := LoadSpriteSheet("alien_big.png", 2, 2)
+	sheet2 := LoadSpriteSheet("alien_big.png", 2, 2)
 
 	// Verify that the same pointer is returned
 	if sheet1 != sheet2 {

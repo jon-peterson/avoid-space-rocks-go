@@ -22,7 +22,7 @@ func (m *MockGameObject) IsAlive() bool {
 	return m.alive
 }
 
-func (m *MockGameObject) OnCollision(other Collidable) error {
+func (m *MockGameObject) OnCollision(_ Collidable) error {
 	return nil
 }
 
@@ -39,7 +39,8 @@ func TestGameObjectCollectionUpdate(t *testing.T) {
 	collection.Add(&MockGameObject{alive: true})
 	collection.Add(&MockGameObject{alive: false})
 
-	// Update the collection
+	// Update the collection twice (so it can remove the dead objects after adding)
+	collection.Update()
 	collection.Update()
 
 	// Verify that only alive objects remain
@@ -61,9 +62,7 @@ func TestGameObjectCollectionCollisionCheck(t *testing.T) {
 	collection.Add(&MockGameObject{alive: true, hitbox: rl.NewRectangle(0, 0, 10, 10)})
 	collection.Add(&MockGameObject{alive: true, hitbox: rl.NewRectangle(5, 5, 10, 10)})
 	collection.Add(&MockGameObject{alive: true, hitbox: rl.NewRectangle(20, 20, 10, 10)})
-
-	// Perform collision check
-	collection.collisionCheck()
+	collection.Update()
 
 	// Verify that collisions are detected correctly
 	// In this case, the first two objects should collide
