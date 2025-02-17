@@ -2,6 +2,7 @@ package playfield
 
 import (
 	"avoid_the_space_rocks/internal/core"
+	"avoid_the_space_rocks/internal/gameobjects"
 	"avoid_the_space_rocks/internal/utils"
 	"github.com/dustin/go-humanize"
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -9,7 +10,7 @@ import (
 
 func InitGameLoop() {
 	game := core.GetGame()
-	game.Observers = append(game.Observers, NewAudioManager(), NewScoreKeeper())
+	game.Observers = append(game.Observers, NewAudioManager(), NewScoreKeeper(), NewGameWarden())
 
 	for _, obs := range game.Observers {
 		if err := obs.Register(game); err != nil {
@@ -37,7 +38,12 @@ func GameLoop() {
 
 // Handle player input
 func handleInput() {
-	spaceship := &core.GetGame().World.Spaceship
+	game := core.GetGame()
+	if game.DebugMode {
+		handleDebugInput()
+	}
+	// Player input
+	spaceship := &game.World.Spaceship
 	if rl.IsKeyDown(rl.KeyLeft) {
 		spaceship.RotateLeft()
 	}
@@ -47,10 +53,25 @@ func handleInput() {
 	if rl.IsKeyPressed(rl.KeySpace) {
 		spaceship.Fire()
 	}
+	spaceship.FuelBurning = rl.IsKeyDown(rl.KeyUp)
+	// Game state input
 	if rl.IsKeyPressed(rl.KeyEscape) {
 		core.GetGame().Paused = !core.GetGame().Paused
 	}
-	spaceship.FuelBurning = rl.IsKeyDown(rl.KeyUp)
+}
+
+func handleDebugInput() {
+	game := core.GetGame()
+	if rl.IsKeyPressed(rl.KeyF1) {
+		game.Lives += 1
+	}
+	if rl.IsKeyPressed(rl.KeyF2) {
+		game.World.Objects.ForEach(func(obj gameobjects.GameObject) {
+			if rock, ok := obj.(*core.Rock); ok {
+				_ = rock.OnDestruction(rl.Vector2{})
+			}
+		})
+	}
 }
 
 // Update all game state since last time through game loop

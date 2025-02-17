@@ -5,6 +5,7 @@ import (
 	evbus "github.com/asaskevich/EventBus"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"math"
+	"os"
 	"sync"
 	"time"
 )
@@ -37,7 +38,8 @@ type Game struct {
 	Level int32
 	Score uint64
 
-	Paused bool
+	Paused    bool
+	DebugMode bool
 
 	EventBus  evbus.Bus
 	Observers []EventObserver
@@ -66,6 +68,9 @@ func InitGame(screenWidth, screenHeight int32) *Game {
 			Paused:    false,
 			EventBus:  evbus.New(),
 			Observers: make([]EventObserver, 0, 10),
+		}
+		if os.Getenv("DEBUG") != "" {
+			instance.DebugMode = true
 		}
 	})
 	return instance
