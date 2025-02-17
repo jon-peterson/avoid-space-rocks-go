@@ -56,12 +56,14 @@ func handleInput() {
 // Update all game state since last time through game loop
 func update() {
 	game := core.GetGame()
-	if !game.Paused {
-		if err := game.World.Spaceship.Update(); err != nil {
-			rl.TraceLog(rl.LogError, "error updating spaceship: %v", err)
-		}
-		game.World.Objects.Update()
+	if game.Paused {
+		return
 	}
+	// Game object update
+	if err := game.World.Spaceship.Update(); err != nil {
+		rl.TraceLog(rl.LogError, "error updating spaceship: %v", err)
+	}
+	game.World.Objects.Update()
 }
 
 // Draw all game state
