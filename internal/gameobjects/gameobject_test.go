@@ -6,6 +6,7 @@ import (
 )
 
 type MockGameObject struct {
+	name   string
 	alive  bool
 	hitbox rl.Rectangle
 }
@@ -76,5 +77,44 @@ func TestGameObjectCollectionCollisionCheck(t *testing.T) {
 	}
 	if rl.CheckCollisionRecs(collection.objects[1].(Collidable).GetHitbox(), collection.objects[2].(Collidable).GetHitbox()) {
 		t.Errorf("Did not expect collision between second and third objects")
+	}
+}
+
+func TestGameObjectCollectionAny(t *testing.T) {
+	collection := NewGameObjectCollection()
+
+	// Add some mock objects
+	collection.Add(&MockGameObject{alive: true, name: "John Bonham"})
+	collection.Add(&MockGameObject{alive: false, name: "Robert Plant"})
+	collection.Add(&MockGameObject{alive: true, name: "Jimmy Page"})
+	collection.Add(&MockGameObject{alive: false, name: "John Paul Jones"})
+	collection.Update()
+
+	// Test case: Check if any object is alive
+	if !collection.Any(func(obj GameObject) bool {
+		return obj.IsAlive()
+	}) {
+		t.Errorf("Expected at least one alive object")
+	}
+
+	// Test case: Check if any object is Jimmy Page
+	if !collection.Any(func(obj GameObject) bool {
+		// Cast obj to MockGameObject to access the name field
+		if mockObj, ok := obj.(*MockGameObject); ok {
+			return mockObj.name == "Jimmy Page"
+		}
+		return false
+	}) {
+		t.Errorf("Expected to find Jimmy Page")
+	}
+
+	if collection.Any(func(obj GameObject) bool {
+		// Cast obj to MockGameObject to access the name field
+		if mockObj, ok := obj.(*MockGameObject); ok {
+			return mockObj.name == "Perry Como"
+		}
+		return false
+	}) {
+		t.Errorf("Should not have found Perry Como")
 	}
 }

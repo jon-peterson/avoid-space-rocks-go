@@ -54,6 +54,31 @@ func (c *GameObjectCollection) Update() {
 	c.collisionCheck()
 }
 
+// Any returns true if any object in the collection matches the predicate.
+func (c *GameObjectCollection) Any(predicate func(GameObject) bool) bool {
+	c.objectsLock.RLock()
+	defer c.objectsLock.RUnlock()
+
+	for _, obj := range c.objects {
+		if predicate(obj) {
+			return true
+		}
+	}
+	return false
+}
+
+// Draw all the objects in the collection.
+func (c *GameObjectCollection) Draw() {
+	c.objectsLock.RLock()
+	defer c.objectsLock.RUnlock()
+
+	for idx, obj := range c.objects {
+		if err := obj.Draw(); err != nil {
+			rl.TraceLog(rl.LogError, "error drawing object %d %v: %v", idx, obj, err)
+		}
+	}
+}
+
 // removeDead removes all dead objects from the collection, after which the collection will be a full
 // slice of alive objects.
 func (c *GameObjectCollection) removeDead() {
@@ -112,13 +137,5 @@ func (c *GameObjectCollection) getCollidable(idx int) Collidable {
 		return cast
 	} else {
 		return nil
-	}
-}
-
-func (c *GameObjectCollection) Draw() {
-	for idx, obj := range c.objects {
-		if err := obj.Draw(); err != nil {
-			rl.TraceLog(rl.LogError, "error drawing object %d %v: %v", idx, obj, err)
-		}
 	}
 }
