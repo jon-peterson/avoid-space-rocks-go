@@ -13,7 +13,7 @@ type Spaceship struct {
 }
 
 func NewSpaceship() Spaceship {
-	sheet := gameobjects.LoadSpriteSheet("spaceship.png", 3, 1)
+	sheet := gameobjects.LoadSpriteSheet("spaceship.png", 7, 1)
 	ship := Spaceship{
 		Spritesheet: sheet,
 		Rigidbody: gameobjects.Rigidbody{
