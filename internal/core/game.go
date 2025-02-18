@@ -1,6 +1,7 @@
 package core
 
 import (
+	"avoid_the_space_rocks/internal/utils"
 	"fmt"
 	evbus "github.com/asaskevich/EventBus"
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -43,6 +44,8 @@ type Game struct {
 
 	EventBus  evbus.Bus
 	Observers []EventObserver
+
+	Overlay func()
 }
 
 type EventObserver interface {
@@ -80,7 +83,12 @@ func InitGame(screenWidth, screenHeight int32) *Game {
 func (g *Game) StartLevel() {
 	g.Level += 1
 	rl.TraceLog(rl.LogInfo, fmt.Sprintf("Starting level %d", g.Level))
+	g.Overlay = func() {
+		utils.CenterText(fmt.Sprintf("Level %d", g.Level), rl.Vector2{X: g.World.Width / 2, Y: g.World.Height / 3}, 60)
+	}
 	time.Sleep(time.Second * 2)
+	g.Overlay = nil
+	time.Sleep(time.Millisecond * 500)
 	for range g.Level + 3 {
 		rock := NewRock(RockBig, g.World.RandomBorderLocation())
 		g.World.Objects.Add(&rock)

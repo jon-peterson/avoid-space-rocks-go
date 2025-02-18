@@ -101,6 +101,8 @@ func render() {
 
 	if game.Paused {
 		utils.CenterText("PAUSED", rl.Vector2{X: game.World.Width / 2, Y: game.World.Height / 3}, 40)
+	} else if game.Overlay != nil {
+		game.Overlay()
 	}
 
 	rl.EndDrawing()
