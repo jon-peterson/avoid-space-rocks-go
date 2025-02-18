@@ -92,8 +92,12 @@ func (r *Rock) GetHitbox() rl.Rectangle {
 }
 
 // OnCollision handles the collision with another Collidable object.
-func (r *Rock) OnCollision(_ gameobjects.Collidable) error {
-	// TODO: Check for collision with the spaceship
+func (r *Rock) OnCollision(other gameobjects.Collidable) error {
+	// TODO: Rock can destroy spaceship
+	_, ok := other.(*Spaceship)
+	if ok {
+		rl.TraceLog(rl.LogInfo, "rock collision with spaceship")
+	}
 	return nil
 }
 

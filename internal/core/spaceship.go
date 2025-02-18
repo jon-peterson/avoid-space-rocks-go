@@ -10,7 +10,11 @@ type Spaceship struct {
 	gameobjects.Rigidbody
 	Spritesheet *gameobjects.SpriteSheet
 	FuelBurning bool // Is the user burning fuel to accelerate?
+	isAlive     bool
 }
+
+var _ gameobjects.Collidable = (*Spaceship)(nil)
+var _ gameobjects.GameObject = (*Spaceship)(nil)
 
 func NewSpaceship() Spaceship {
 	sheet := gameobjects.LoadSpriteSheet("spaceship.png", 7, 1)
@@ -69,6 +73,23 @@ func (s *Spaceship) Fire() {
 	game := GetGame()
 	game.World.Objects.Add(&b)
 	game.EventBus.Publish("spaceship:fire")
+}
+
+func (s *Spaceship) IsAlive() bool {
+	return s.isAlive
+}
+
+func (s *Spaceship) IsEnemy() bool {
+	return false
+}
+
+func (s *Spaceship) OnCollision(_ gameobjects.Collidable) error {
+	// Spaceship is always considered the anvil so we always do nothing here
+	return nil
+}
+
+func (s *Spaceship) GetHitbox() rl.Rectangle {
+	return s.Spritesheet.GetRectangle(s.Position)
 }
 
 // frameIndex returns the index of the correct frame to use in the sprite sheet. There are two
