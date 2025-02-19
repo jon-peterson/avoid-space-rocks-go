@@ -17,12 +17,12 @@ var once sync.Once
 // Constants for gameplay feel
 const (
 	shipRotateSpeed float32 = math.Pi * 3 // 1.5 rotations per second
-	shipMaxSpeed    float32 = 20.0        // 20 units per second
-	shipDecaySpeed  float32 = 3.0         // units per second slower
-	shipFuelBoost   float32 = 10.0        // units per second added to acceleration
+	shipMaxSpeed    float32 = 7.50        // units per second max speed
+	shipDecaySpeed  float32 = 1.0         // units per second slower
+	shipFuelBoost   float32 = 3.0         // units per second added to acceleration
 
-	bulletSpeed      float32 = 10.0 // units per second
-	bulletMaxSpeed   float32 = 20.0 // units per second
+	bulletSpeed      float32 = 10.0  // units per second
+	bulletMaxSpeed   float32 = 100.0 // units per second
 	bulletLifetimeMs uint16  = 1000
 
 	shrapnelMaxSpeed  float32 = 6.0          // units per second
