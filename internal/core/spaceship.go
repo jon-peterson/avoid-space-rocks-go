@@ -10,7 +10,7 @@ type Spaceship struct {
 	gameobjects.Rigidbody
 	Spritesheet *gameobjects.SpriteSheet
 	FuelBurning bool // Is the user burning fuel to accelerate?
-	isAlive     bool
+	Alive       bool
 }
 
 var _ gameobjects.Collidable = (*Spaceship)(nil)
@@ -26,6 +26,7 @@ func NewSpaceship() Spaceship {
 				Rotation: rl.Vector2{X: 0, Y: -1},
 			},
 		},
+		Alive:       true,
 		FuelBurning: false,
 	}
 	return ship
@@ -76,7 +77,7 @@ func (s *Spaceship) Fire() {
 }
 
 func (s *Spaceship) IsAlive() bool {
-	return s.isAlive
+	return s.Alive
 }
 
 func (s *Spaceship) IsEnemy() bool {
