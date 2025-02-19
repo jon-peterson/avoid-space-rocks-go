@@ -2,6 +2,7 @@ package core
 
 import (
 	"avoid_the_space_rocks/internal/gameobjects"
+	"avoid_the_space_rocks/internal/utils"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"math"
 )
@@ -105,4 +106,21 @@ func (s *Spaceship) frameIndex() int {
 		}
 	}
 	return 0
+}
+
+// OnDestruction handles the destruction of the spaceship, causing pieces to fly around.
+// This is called by the rock's OnCollision method when it hits this spaceship.
+func (s *Spaceship) OnDestruction(_ rl.Vector2) error {
+	game := GetGame()
+	game.Lives -= 1
+	s.Alive = false
+	// Spawn the pieces flying away
+	for i := range 4 {
+		piece := NewShrapnel(s.Position, s.Spritesheet, uint16(utils.RndInt32InRange(1000, 2000)))
+		piece.frame = i + 3
+		game.World.Objects.Add(&piece)
+	}
+	// Notify other services
+	game.EventBus.Publish("spaceship:destroyed")
+	return nil
 }

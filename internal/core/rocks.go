@@ -93,10 +93,9 @@ func (r *Rock) GetHitbox() rl.Rectangle {
 
 // OnCollision handles the collision with another Collidable object.
 func (r *Rock) OnCollision(other gameobjects.Collidable) error {
-	// TODO: Rock can destroy spaceship
-	_, ok := other.(*Spaceship)
+	s, ok := other.(*Spaceship)
 	if ok {
-		rl.TraceLog(rl.LogInfo, "rock collision with spaceship")
+		return s.OnDestruction(r.Velocity)
 	}
 	return nil
 }
@@ -117,8 +116,10 @@ func (r *Rock) OnDestruction(bulletVelocity rl.Vector2) error {
 		}
 	}
 	// Spawn shrapnel in random directions and lifespans
+	sheet := gameobjects.LoadSpriteSheet("shrapnel.png", 4, 1)
 	for range utils.RndInt32InRange(int32(r.size)+2, int32(r.size*2)+4) {
-		shrapnel := NewShrapnel(r.Position, uint16(utils.RndInt32InRange(300, 600)))
+		shrapnel := NewShrapnel(r.Position, sheet, uint16(utils.RndInt32InRange(300, 600)))
+		shrapnel.frame = int(utils.RndInt32InRange(0, 3))
 		game.World.Objects.Add(&shrapnel)
 	}
 	// Notify other services

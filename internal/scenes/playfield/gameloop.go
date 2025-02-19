@@ -44,16 +44,18 @@ func handleInput() {
 	}
 	// Player input
 	spaceship := &game.World.Spaceship
-	if rl.IsKeyDown(rl.KeyLeft) {
-		spaceship.RotateLeft()
+	if spaceship.IsAlive() {
+		if rl.IsKeyDown(rl.KeyLeft) {
+			spaceship.RotateLeft()
+		}
+		if rl.IsKeyDown(rl.KeyRight) {
+			spaceship.RotateRight()
+		}
+		if rl.IsKeyPressed(rl.KeySpace) {
+			spaceship.Fire()
+		}
+		spaceship.FuelBurning = rl.IsKeyDown(rl.KeyUp)
 	}
-	if rl.IsKeyDown(rl.KeyRight) {
-		spaceship.RotateRight()
-	}
-	if rl.IsKeyPressed(rl.KeySpace) {
-		spaceship.Fire()
-	}
-	spaceship.FuelBurning = rl.IsKeyDown(rl.KeyUp)
 	// Game state input
 	if rl.IsKeyPressed(rl.KeyEscape) {
 		core.GetGame().Paused = !core.GetGame().Paused
@@ -80,10 +82,6 @@ func update() {
 	if game.Paused {
 		return
 	}
-	// Game object update
-	if err := game.World.Spaceship.Update(); err != nil {
-		rl.TraceLog(rl.LogError, "error updating spaceship: %v", err)
-	}
 	game.World.Objects.Update()
 }
 
@@ -94,9 +92,6 @@ func render() {
 	rl.ClearBackground(rl.RayWhite)
 	drawHud()
 
-	if err := game.World.Spaceship.Draw(); err != nil {
-		rl.TraceLog(rl.LogError, "error drawing spaceship: %v", err)
-	}
 	game.World.Objects.Draw()
 
 	if game.Paused {
