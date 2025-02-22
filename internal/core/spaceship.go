@@ -23,11 +23,7 @@ func NewSpaceship() Spaceship {
 		Spritesheet: sheet,
 		Rigidbody: gameobjects.Rigidbody{
 			MaxVelocity: shipMaxSpeed,
-			Transform: gameobjects.Transform{
-				Rotation: rl.Vector2{X: 0, Y: -1},
-			},
 		},
-		Alive:       true,
 		FuelBurning: false,
 	}
 	return ship
@@ -48,6 +44,20 @@ func (s *Spaceship) Update() error {
 	game := GetGame()
 	s.Position = game.World.Wraparound(rl.Vector2Add(s.Position, s.Velocity))
 	return nil
+}
+
+// Spawn the spaceship at the center of the playfield at the start of level
+func (s *Spaceship) Spawn() {
+	world := GetGame().World
+	s.Alive = true
+	s.Position = rl.Vector2{
+		X: world.Width / 2,
+		Y: world.Height / 2,
+	}
+	s.Velocity = rl.Vector2{}
+	s.Acceleration = rl.Vector2{}
+	s.Rotation = rl.Vector2{X: 0, Y: -1}
+	world.Objects.Add(s)
 }
 
 // Draw the spaceship at its current position and rotation
@@ -112,7 +122,6 @@ func (s *Spaceship) frameIndex() int {
 // This is called by the rock's OnCollision method when it hits this spaceship.
 func (s *Spaceship) OnDestruction(_ rl.Vector2) error {
 	game := GetGame()
-	game.Lives -= 1
 	s.Alive = false
 	// Spawn the pieces flying away
 	for i := range 4 {

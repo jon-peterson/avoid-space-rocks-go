@@ -24,13 +24,9 @@ func NewWorld(width, height int32) *World {
 
 func (w *World) Initialize() {
 	// Spaceship starts in the middle pointing up
-	w.Spaceship = NewSpaceship()
-	w.Spaceship.Position = rl.Vector2{
-		X: w.Width / 2,
-		Y: w.Height / 2,
-	}
 	w.Objects = gameobjects.NewGameObjectCollection()
-	w.Objects.Add(&w.Spaceship)
+	w.Spaceship = NewSpaceship()
+	w.Spaceship.Spawn()
 }
 
 // Wraparound returns the position of the given position, wrapping around the edges of the playfield

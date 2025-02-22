@@ -3,6 +3,7 @@ package playfield
 import (
 	"avoid_the_space_rocks/internal/core"
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"time"
 )
 
 type GameWarden struct {
@@ -18,6 +19,10 @@ func (gw *GameWarden) Register(game *core.Game) error {
 		rl.TraceLog(rl.LogError, "error subscribing to rock:destroyed event: %v", err)
 		return err
 	}
+	if err := game.EventBus.SubscribeAsync("spaceship:destroyed", gw.SpaceshipDestroyedWatcher, true); err != nil {
+		rl.TraceLog(rl.LogError, "error subscribing to spaceship:destroyed event: %v", err)
+		return err
+	}
 	gw.game = game
 	return nil
 }
@@ -25,6 +30,10 @@ func (gw *GameWarden) Register(game *core.Game) error {
 func (gw *GameWarden) Deregister(game *core.Game) error {
 	if err := game.EventBus.Unsubscribe("rock:destroyed", gw.EnemyDestroyedWatcher); err != nil {
 		rl.TraceLog(rl.LogError, "error unsubscribing from rock:destroyed event: %v", err)
+		return err
+	}
+	if err := game.EventBus.Unsubscribe("spaceship:destroyed", gw.SpaceshipDestroyedWatcher); err != nil {
+		rl.TraceLog(rl.LogError, "error unsubscribing from spaceship:destroyed event: %v", err)
 		return err
 	}
 	gw.game = game
@@ -37,5 +46,16 @@ func (gw *GameWarden) EnemyDestroyedWatcher(_ core.RockSize) {
 	// If all rocks are done we can launch the next level
 	if !gw.game.World.Objects.HasRemainingEnemies() {
 		go gw.game.StartLevel()
+	}
+}
+
+// SpaceshipDestroyedWatcher is called when the spaceship is destroyed. It decrements the lives
+// remaining, waits a moment, and then respawns the spaceship. If the player is out of lives it goes to
+// game over state.
+func (gw *GameWarden) SpaceshipDestroyedWatcher() {
+	gw.game.Lives--
+	if gw.game.Lives > 0 {
+		time.Sleep(5 * time.Second)
+		gw.game.World.Spaceship.Spawn()
 	}
 }
