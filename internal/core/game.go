@@ -94,3 +94,13 @@ func (g *Game) StartLevel() {
 		g.World.Objects.Add(&rock)
 	}
 }
+
+// GameOver is called when the player has no more lives.
+func (g *Game) GameOver() {
+	rl.TraceLog(rl.LogInfo, "Game over")
+	g.Overlay = func() {
+		utils.CenterText("Game Over", rl.Vector2{X: g.World.Width / 2, Y: g.World.Height / 3}, 60)
+	}
+	time.Sleep(time.Second * 5)
+	g.Overlay = nil
+}
