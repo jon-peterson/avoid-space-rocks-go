@@ -3,12 +3,13 @@ package playfield
 import (
 	"avoid_the_space_rocks/internal/core"
 	"avoid_the_space_rocks/internal/gameobjects"
+	"avoid_the_space_rocks/internal/scenes"
 	"avoid_the_space_rocks/internal/utils"
 	"github.com/dustin/go-humanize"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func InitGameLoop() {
+func Init() {
 	game := core.GetGame()
 	game.Observers = append(game.Observers, NewAudioManager(), NewScoreKeeper(), NewGameWarden())
 
@@ -19,7 +20,7 @@ func InitGameLoop() {
 	}
 }
 
-func CloseGameLoop() {
+func Close() {
 	game := core.GetGame()
 	for _, obs := range game.Observers {
 		if err := obs.Deregister(game); err != nil {
@@ -28,12 +29,13 @@ func CloseGameLoop() {
 	}
 }
 
-func GameLoop() {
+func Loop() scenes.SceneCode {
 	for !rl.WindowShouldClose() {
 		handleInput()
 		update()
 		render()
 	}
+	return scenes.AttractMode
 }
 
 // Handle player input

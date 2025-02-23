@@ -23,8 +23,8 @@ func main() {
 	// For now there's only one screen, jump right into it
 	game := core.InitGame(screenWidth, screenHeight)
 	game.World.Initialize()
-	playfield.InitGameLoop()
+	playfield.Init()
 	go game.StartLevel()
-	playfield.GameLoop()
-	playfield.CloseGameLoop()
+	playfield.Loop()
+	playfield.Close()
 }
