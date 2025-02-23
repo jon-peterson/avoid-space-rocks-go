@@ -9,18 +9,25 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func Init() {
-	game := core.GetGame()
-	game.Observers = append(game.Observers, NewAudioManager(), NewScoreKeeper(), NewGameWarden())
+type Gameloop struct {
+}
 
+var _ scenes.Scene = (*Gameloop)(nil)
+
+func (gl *Gameloop) Init(width, height float32) {
+	core.InitGame(width, height)
+	game := core.GetGame()
+	game.World.Initialize()
+	game.Observers = append(game.Observers, NewAudioManager(), NewScoreKeeper(), NewGameWarden())
 	for _, obs := range game.Observers {
 		if err := obs.Register(game); err != nil {
 			rl.TraceLog(rl.LogError, "error registering observer: %v", err)
 		}
 	}
+	go game.StartLevel()
 }
 
-func Close() {
+func (gl *Gameloop) Close() {
 	game := core.GetGame()
 	for _, obs := range game.Observers {
 		if err := obs.Deregister(game); err != nil {
@@ -29,13 +36,13 @@ func Close() {
 	}
 }
 
-func Loop() scenes.SceneCode {
+func (gl *Gameloop) Loop() scenes.SceneCode {
 	for !rl.WindowShouldClose() {
 		handleInput()
 		update()
 		render()
 	}
-	return scenes.AttractMode
+	return scenes.AttractModeScene
 }
 
 // Handle player input

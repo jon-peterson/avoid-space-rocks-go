@@ -1,7 +1,7 @@
 package scenes
 
 type Scene interface {
-	Init()
+	Init(width, height float32)
 	Loop() SceneCode
 	Close()
 }
@@ -9,7 +9,8 @@ type Scene interface {
 type SceneCode int
 
 const (
-	AttractMode SceneCode = iota
-	Gameplay
-	GameOver
+	AttractModeScene SceneCode = iota
+	GameplayScene
+	GameOverScene
+	Quit
 )

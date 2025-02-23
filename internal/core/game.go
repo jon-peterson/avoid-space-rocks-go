@@ -60,7 +60,7 @@ func GetGame() *Game {
 	return instance
 }
 
-func InitGame(screenWidth, screenHeight int32) *Game {
+func InitGame(screenWidth, screenHeight float32) *Game {
 	once.Do(func() {
 		w := NewWorld(screenWidth, screenHeight)
 		instance = &Game{

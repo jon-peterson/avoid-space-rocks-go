@@ -14,10 +14,10 @@ type World struct {
 	Objects   gameobjects.GameObjectCollection
 }
 
-func NewWorld(width, height int32) *World {
+func NewWorld(width, height float32) *World {
 	w := World{
-		Width:  float32(width),
-		Height: float32(height),
+		Width:  width,
+		Height: height,
 	}
 	return &w
 }
