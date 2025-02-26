@@ -33,7 +33,7 @@ func (am *GameOverMode) Loop() scenes.SceneCode {
 	for !rl.WindowShouldClose() && next == scenes.GameOverScene {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
-		utils.CenterText("Game Over", rl.Vector2{X: am.width / 2, Y: am.height / 3}, 40)
+		utils.CenterText("Game Over", rl.Vector2{X: am.width / 2, Y: am.height / 3}, 80)
 		rl.EndDrawing()
 	}
 

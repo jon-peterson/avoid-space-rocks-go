@@ -33,7 +33,12 @@ func (am *AttractMode) Loop() scenes.SceneCode {
 
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
-		utils.CenterText("Avoid the Space Rocks", rl.Vector2{X: am.width / 2, Y: am.height / 3}, 40)
+
+		utils.CenterText("Avoid", rl.Vector2{X: am.width / 2, Y: am.height/3 - 55}, 80)
+		utils.CenterText("the", rl.Vector2{X: am.width / 2, Y: am.height / 3}, 40)
+		utils.CenterText("Space Rocks", rl.Vector2{X: am.width / 2, Y: am.height/3 + 50}, 80)
+
+		utils.CenterText("Press any key to start", rl.Vector2{X: am.width / 2, Y: am.height/3 + 180}, 20)
 		rl.EndDrawing()
 	}
 
