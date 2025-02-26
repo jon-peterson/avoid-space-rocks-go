@@ -43,6 +43,9 @@ func (gl *Gameloop) Loop() scenes.SceneCode {
 		update()
 		render()
 	}
+	if rl.WindowShouldClose() {
+		return scenes.Quit
+	}
 	return scenes.GameOverScene
 }
 

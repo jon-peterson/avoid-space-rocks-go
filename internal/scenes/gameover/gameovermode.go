@@ -37,5 +37,8 @@ func (am *GameOverMode) Loop() scenes.SceneCode {
 		rl.EndDrawing()
 	}
 
+	if rl.WindowShouldClose() {
+		return scenes.Quit
+	}
 	return next
 }
