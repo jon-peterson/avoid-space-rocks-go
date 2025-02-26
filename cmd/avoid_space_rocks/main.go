@@ -3,6 +3,7 @@ package main
 import (
 	"avoid_the_space_rocks/internal/scenes"
 	"avoid_the_space_rocks/internal/scenes/attractmode"
+	"avoid_the_space_rocks/internal/scenes/gameover"
 	"avoid_the_space_rocks/internal/scenes/playfield"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -40,8 +41,11 @@ func initScene(code scenes.SceneCode) scenes.Scene {
 		gm.Init(screenWidth, screenHeight)
 		return gm
 	} else if code == scenes.GameOverScene {
-		return nil
+		gom := &gameover.GameOverMode{}
+		gom.Init(screenWidth, screenHeight)
+		return gom
 	} else {
+		rl.TraceLog(rl.LogError, "Unknown scene code %v", code)
 		return nil
 	}
 }

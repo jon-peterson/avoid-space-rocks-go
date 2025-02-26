@@ -7,12 +7,10 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"math"
 	"os"
-	"sync"
 	"time"
 )
 
 var instance *Game
-var once sync.Once
 
 // Constants for gameplay feel
 const (
@@ -41,6 +39,7 @@ type Game struct {
 
 	Paused    bool
 	DebugMode bool
+	Over      bool
 
 	EventBus  evbus.Bus
 	Observers []EventObserver
@@ -61,21 +60,16 @@ func GetGame() *Game {
 }
 
 func InitGame(screenWidth, screenHeight float32) *Game {
-	once.Do(func() {
-		w := NewWorld(screenWidth, screenHeight)
-		instance = &Game{
-			World:     w,
-			Lives:     3,
-			Level:     0,
-			Score:     0,
-			Paused:    false,
-			EventBus:  evbus.New(),
-			Observers: make([]EventObserver, 0, 10),
-		}
-		if os.Getenv("DEBUG") != "" {
-			instance.DebugMode = true
-		}
-	})
+	w := NewWorld(screenWidth, screenHeight)
+	instance = &Game{
+		World:     w,
+		Lives:     3,
+		EventBus:  evbus.New(),
+		Observers: make([]EventObserver, 0, 10),
+	}
+	if os.Getenv("DEBUG") != "" {
+		instance.DebugMode = true
+	}
 	return instance
 }
 
@@ -97,7 +91,6 @@ func (g *Game) StartLevel() {
 
 // GameOver is called when the player has no more lives.
 func (g *Game) GameOver() {
-	rl.TraceLog(rl.LogInfo, "Game over")
 	g.Overlay = func() {
 		utils.CenterText("Game Over", rl.Vector2{X: g.World.Width / 2, Y: g.World.Height / 3}, 60)
 	}

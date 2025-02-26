@@ -37,12 +37,13 @@ func (gl *Gameloop) Close() {
 }
 
 func (gl *Gameloop) Loop() scenes.SceneCode {
-	for !rl.WindowShouldClose() {
+	game := core.GetGame()
+	for !rl.WindowShouldClose() && !game.Over {
 		handleInput()
 		update()
 		render()
 	}
-	return scenes.AttractModeScene
+	return scenes.GameOverScene
 }
 
 // Handle player input

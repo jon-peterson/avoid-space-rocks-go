@@ -54,10 +54,11 @@ func (gw *GameWarden) EnemyDestroyedWatcher(_ core.RockSize) {
 // game over state.
 func (gw *GameWarden) SpaceshipDestroyedWatcher() {
 	gw.game.Lives--
-	time.Sleep(5 * time.Second)
+	time.Sleep(4 * time.Second)
 	if gw.game.Lives > 0 {
 		gw.game.World.Spaceship.Spawn()
 	} else {
-		gw.game.GameOver()
+		rl.TraceLog(rl.LogInfo, "Game over")
+		gw.game.Over = true
 	}
 }
