@@ -21,8 +21,7 @@ func NewBullet(position, velocity rl.Vector2) Bullet {
 	bullet := Bullet{
 		spritesheet: sheet,
 		Rigidbody: gameobjects.Rigidbody{
-			Velocity:    velocity,
-			MaxVelocity: bulletMaxSpeed,
+			Velocity: velocity,
 			Transform: gameobjects.Transform{
 				Position: position,
 			},
