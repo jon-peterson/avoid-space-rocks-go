@@ -18,11 +18,6 @@ func NewAudioManager() *AudioManager {
 	}
 }
 
-type eventMapping struct {
-	event   string
-	handler any
-}
-
 func (mgr *AudioManager) eventMappings() []eventMapping {
 	return []eventMapping{
 		{"rock:destroyed", mgr.RockExplosionHandler},

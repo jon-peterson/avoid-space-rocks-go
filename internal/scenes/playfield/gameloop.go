@@ -12,6 +12,11 @@ import (
 type Gameloop struct {
 }
 
+type eventMapping struct {
+	event   string
+	handler any
+}
+
 var _ scenes.Scene = (*Gameloop)(nil)
 
 func (gl *Gameloop) Init(width, height float32) {
@@ -57,7 +62,7 @@ func handleInput() {
 	}
 	// Player input
 	spaceship := &game.World.Spaceship
-	if spaceship.IsAlive() {
+	if spaceship.IsAlive() && !spaceship.InHyperspace {
 		if rl.IsKeyDown(rl.KeyLeft) {
 			spaceship.RotateLeft()
 		}

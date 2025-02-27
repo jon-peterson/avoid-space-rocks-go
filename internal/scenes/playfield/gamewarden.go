@@ -10,33 +10,36 @@ type GameWarden struct {
 	game *core.Game
 }
 
+func (gw *GameWarden) eventMappings() []eventMapping {
+	return []eventMapping{
+		{"rock:destroyed", gw.EnemyDestroyedWatcher},
+		{"spaceship:destroyed", gw.SpaceshipDestroyedWatcher},
+		{"spaceship:enter_hyperspace", gw.SpaceshipHyperspaceWatcher},
+	}
+}
+
 func NewGameWarden() *GameWarden {
 	return &GameWarden{}
 }
 
 func (gw *GameWarden) Register(game *core.Game) error {
-	if err := game.EventBus.Subscribe("rock:destroyed", gw.EnemyDestroyedWatcher); err != nil {
-		rl.TraceLog(rl.LogError, "error subscribing to rock:destroyed event: %v", err)
-		return err
-	}
-	if err := game.EventBus.SubscribeAsync("spaceship:destroyed", gw.SpaceshipDestroyedWatcher, true); err != nil {
-		rl.TraceLog(rl.LogError, "error subscribing to spaceship:destroyed event: %v", err)
-		return err
-	}
 	gw.game = game
+	for _, sub := range gw.eventMappings() {
+		if err := game.EventBus.SubscribeAsync(sub.event, sub.handler, false); err != nil {
+			rl.TraceLog(rl.LogError, "error subscribing to %s event: %v", sub.event, err)
+			return err
+		}
+	}
 	return nil
 }
 
 func (gw *GameWarden) Deregister(game *core.Game) error {
-	if err := game.EventBus.Unsubscribe("rock:destroyed", gw.EnemyDestroyedWatcher); err != nil {
-		rl.TraceLog(rl.LogError, "error unsubscribing from rock:destroyed event: %v", err)
-		return err
+	for _, sub := range gw.eventMappings() {
+		if err := game.EventBus.Unsubscribe(sub.event, sub.handler); err != nil {
+			rl.TraceLog(rl.LogError, "error unsubscribing from %s event: %v", sub.event, err)
+			return err
+		}
 	}
-	if err := game.EventBus.Unsubscribe("spaceship:destroyed", gw.SpaceshipDestroyedWatcher); err != nil {
-		rl.TraceLog(rl.LogError, "error unsubscribing from spaceship:destroyed event: %v", err)
-		return err
-	}
-	gw.game = game
 	return nil
 }
 
@@ -61,4 +64,13 @@ func (gw *GameWarden) SpaceshipDestroyedWatcher() {
 		rl.TraceLog(rl.LogInfo, "Game over")
 		gw.game.Over = true
 	}
+}
+
+// SpaceshipHyperspaceWatcher moves the spaceship to a random location with some graphic flair
+func (gw *GameWarden) SpaceshipHyperspaceWatcher() {
+	s := &gw.game.World.Spaceship
+	s.InHyperspace = true
+	time.Sleep(4 * time.Second)
+	s.Position = gw.game.World.RandomPosition()
+	s.InHyperspace = false
 }

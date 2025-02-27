@@ -9,9 +9,10 @@ import (
 
 type Spaceship struct {
 	gameobjects.Rigidbody
-	Spritesheet *gameobjects.SpriteSheet
-	FuelBurning bool // Is the user burning fuel to accelerate?
-	Alive       bool
+	Spritesheet  *gameobjects.SpriteSheet
+	FuelBurning  bool // Is the user burning fuel to accelerate?
+	Alive        bool
+	InHyperspace bool
 }
 
 var _ gameobjects.Collidable = (*Spaceship)(nil)
@@ -24,7 +25,8 @@ func NewSpaceship() Spaceship {
 		Rigidbody: gameobjects.Rigidbody{
 			MaxVelocity: shipMaxSpeed,
 		},
-		FuelBurning: false,
+		FuelBurning:  false,
+		InHyperspace: false,
 	}
 	return ship
 }
@@ -62,8 +64,11 @@ func (s *Spaceship) Spawn() {
 
 // Draw the spaceship at its current position and rotation
 func (s *Spaceship) Draw() error {
-	frame := s.frameIndex()
-	return s.Spritesheet.Draw(frame, 0, s.Position, s.Rotation)
+	if !s.InHyperspace {
+		frame := s.frameIndex()
+		return s.Spritesheet.Draw(frame, 0, s.Position, s.Rotation)
+	}
+	return nil
 }
 
 // RotateLeft rotates the spaceship to the left the standard amount
@@ -127,6 +132,9 @@ func (s *Spaceship) frameIndex() int {
 // OnDestruction handles the destruction of the spaceship, causing pieces to fly around.
 // This is called by the rock's OnCollision method when it hits this spaceship.
 func (s *Spaceship) OnDestruction(_ rl.Vector2) error {
+	if s.InHyperspace {
+		return nil
+	}
 	game := GetGame()
 	s.Alive = false
 	// Spawn the pieces flying away

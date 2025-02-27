@@ -44,7 +44,7 @@ func (w *World) Wraparound(p rl.Vector2) rl.Vector2 {
 	return p
 }
 
-func (w *World) RandomBorderLocation() rl.Vector2 {
+func (w *World) RandomBorderPosition() rl.Vector2 {
 	if random.Chance(0.5) {
 		return rl.Vector2{
 			X: random.RndFloat32(w.Width),
@@ -53,6 +53,13 @@ func (w *World) RandomBorderLocation() rl.Vector2 {
 	}
 	return rl.Vector2{
 		X: random.Choice([]float32{0, w.Width}),
+		Y: random.RndFloat32(w.Height),
+	}
+}
+
+func (w *World) RandomPosition() rl.Vector2 {
+	return rl.Vector2{
+		X: random.RndFloat32(w.Width),
 		Y: random.RndFloat32(w.Height),
 	}
 }

@@ -83,7 +83,7 @@ func (g *Game) StartLevel() {
 	g.Overlay = nil
 	time.Sleep(time.Millisecond * 500)
 	for range g.Level + 3 {
-		rock := NewRock(RockBig, g.World.RandomBorderLocation())
+		rock := NewRock(RockBig, g.World.RandomBorderPosition())
 		g.World.Objects.Add(&rock)
 	}
 }
