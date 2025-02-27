@@ -18,6 +18,8 @@ func (b *Rigidbody) String() string {
 
 func (b *Rigidbody) ApplyPhysics() {
 	b.Velocity = rl.Vector2Add(b.Velocity, b.Acceleration)
-	b.Velocity = rl.Vector2ClampValue(b.Velocity, 0, b.MaxVelocity)
+	if b.MaxVelocity > 0 {
+		b.Velocity = rl.Vector2ClampValue(b.Velocity, 0, b.MaxVelocity)
+	}
 	b.Position = rl.Vector2Add(b.Position, b.Velocity)
 }
