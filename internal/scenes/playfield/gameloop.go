@@ -64,10 +64,15 @@ func handleInput() {
 		if rl.IsKeyDown(rl.KeyRight) {
 			spaceship.RotateRight()
 		}
-		if rl.IsKeyPressed(rl.KeySpace) {
+		spaceship.FuelBurning = rl.IsKeyDown(rl.KeyUp)
+
+		pressedKey := rl.GetKeyPressed()
+		if pressedKey == rl.KeySpace {
 			spaceship.Fire()
 		}
-		spaceship.FuelBurning = rl.IsKeyDown(rl.KeyUp)
+		if pressedKey == rl.KeyEnter {
+			spaceship.EnterHyperspace()
+		}
 	}
 	// Game state input
 	if rl.IsKeyPressed(rl.KeyEscape) {

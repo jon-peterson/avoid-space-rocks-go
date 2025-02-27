@@ -87,6 +87,12 @@ func (s *Spaceship) Fire() {
 	game.EventBus.Publish("spaceship:fire")
 }
 
+// EnterHyperspace causes the spaceship to jump to a random location on the playfield
+func (s *Spaceship) EnterHyperspace() {
+	game := GetGame()
+	game.EventBus.Publish("spaceship:enter_hyperspace")
+}
+
 func (s *Spaceship) IsAlive() bool {
 	return s.Alive
 }

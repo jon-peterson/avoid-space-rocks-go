@@ -18,34 +18,36 @@ func NewAudioManager() *AudioManager {
 	}
 }
 
+type eventMapping struct {
+	event   string
+	handler any
+}
+
+func (mgr *AudioManager) eventMappings() []eventMapping {
+	return []eventMapping{
+		{"rock:destroyed", mgr.RockExplosionHandler},
+		{"spaceship:fire", mgr.SpaceshipFireHandler},
+		{"spaceship:enter_hyperspace", mgr.SpaceshipEnterHyperspaceHandler},
+		{"spaceship:destroyed", mgr.SpaceshipExplosionHandler},
+	}
+}
+
 func (mgr *AudioManager) Register(game *core.Game) error {
-	if err := game.EventBus.SubscribeAsync("rock:destroyed", mgr.RockExplosionHandler, false); err != nil {
-		rl.TraceLog(rl.LogError, "error subscribing to rock:destroyed event: %v", err)
-		return err
-	}
-	if err := game.EventBus.Subscribe("spaceship:fire", mgr.SpaceshipFireHandler); err != nil {
-		rl.TraceLog(rl.LogError, "error subscribing to spaceship:fire event: %v", err)
-		return err
-	}
-	if err := game.EventBus.Subscribe("spaceship:destroyed", mgr.SpaceshipExplosionHandler); err != nil {
-		rl.TraceLog(rl.LogError, "error subscribing to spaceship:destroyed event: %v", err)
-		return err
+	for _, sub := range mgr.eventMappings() {
+		if err := game.EventBus.SubscribeAsync(sub.event, sub.handler, false); err != nil {
+			rl.TraceLog(rl.LogError, "error subscribing to %s event: %v", sub.event, err)
+			return err
+		}
 	}
 	return nil
 }
 
 func (mgr *AudioManager) Deregister(game *core.Game) error {
-	if err := game.EventBus.Unsubscribe("rock:destroyed", mgr.RockExplosionHandler); err != nil {
-		rl.TraceLog(rl.LogError, "error unsubscribing from rock:destroyed event: %v", err)
-		return err
-	}
-	if err := game.EventBus.Unsubscribe("spaceship:fire", mgr.SpaceshipFireHandler); err != nil {
-		rl.TraceLog(rl.LogError, "error unsubscribing from spaceship:fire event: %v", err)
-		return err
-	}
-	if err := game.EventBus.Unsubscribe("spaceship:destroyed", mgr.SpaceshipExplosionHandler); err != nil {
-		rl.TraceLog(rl.LogError, "error unsubscribing from spaceship:fire event: %v", err)
-		return err
+	for _, sub := range mgr.eventMappings() {
+		if err := game.EventBus.Unsubscribe(sub.event, sub.handler); err != nil {
+			rl.TraceLog(rl.LogError, "error unsubscribing from %s event: %v", sub.event, err)
+			return err
+		}
 	}
 	return nil
 }
@@ -69,6 +71,10 @@ func (mgr *AudioManager) SpaceshipFireHandler() {
 
 func (mgr *AudioManager) SpaceshipExplosionHandler() {
 	_ = mgr.playSound("explosion_ship.wav")
+}
+
+func (mgr *AudioManager) SpaceshipEnterHyperspaceHandler() {
+	_ = mgr.playSound("hyperspace.wav")
 }
 
 func (mgr *AudioManager) playSound(filename string) error {
