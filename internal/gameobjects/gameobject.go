@@ -18,9 +18,10 @@ type Collidable interface {
 }
 
 type GameObjectCollection struct {
-	objects     []GameObject
-	newObjects  []GameObject
-	objectsLock sync.RWMutex
+	objects        []GameObject
+	newObjects     []GameObject
+	objectsLock    sync.RWMutex
+	newObjectsLock sync.RWMutex
 }
 
 func NewGameObjectCollection() GameObjectCollection {
@@ -32,6 +33,8 @@ func NewGameObjectCollection() GameObjectCollection {
 
 // Add adds a game object to the collection.
 func (c *GameObjectCollection) Add(obj GameObject) {
+	c.newObjectsLock.Lock()
+	defer c.newObjectsLock.Unlock()
 	c.newObjects = append(c.newObjects, obj)
 }
 
@@ -128,7 +131,9 @@ func (c *GameObjectCollection) removeDead() {
 // birthNew adds all the new objects to the collection.
 func (c *GameObjectCollection) birthNew() {
 	c.objectsLock.Lock()
+	c.newObjectsLock.Lock()
 	defer c.objectsLock.Unlock()
+	defer c.newObjectsLock.Unlock()
 
 	c.objects = append(c.objects, c.newObjects...)
 	c.newObjects = c.newObjects[:0]
