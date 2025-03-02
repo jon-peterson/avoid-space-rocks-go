@@ -18,7 +18,7 @@ type Shrapnel struct {
 var _ gameobjects.GameObject = (*Shrapnel)(nil)
 
 // NewShrapnel creates a new piece of shrapnel with random direction and lifetime
-func NewShrapnel(position rl.Vector2, sheet *gameobjects.SpriteSheet, lifespan uint16) Shrapnel {
+func NewShrapnel(position rl.Vector2, sheet *gameobjects.SpriteSheet, lifespan uint16, frame int) Shrapnel {
 	shrapnel := Shrapnel{
 		spritesheet: sheet,
 		Rigidbody: gameobjects.Rigidbody{
@@ -38,6 +38,7 @@ func NewShrapnel(position rl.Vector2, sheet *gameobjects.SpriteSheet, lifespan u
 		rotationSpeed: utils.RndFloat32(shrapnelMaxRotate),
 		lifespanMs:    lifespan,
 		ageMs:         0,
+		frame:         frame,
 	}
 	// Half of 'em rotate counterclockwise
 	if utils.Chance(0.5) {
