@@ -17,9 +17,11 @@ func (b *Rigidbody) String() string {
 }
 
 func (b *Rigidbody) ApplyPhysics() {
+	delta := rl.GetFrameTime()
 	b.Velocity = rl.Vector2Add(b.Velocity, b.Acceleration)
+	move := rl.Vector2Scale(b.Velocity, delta)
 	if b.MaxVelocity > 0 {
-		b.Velocity = rl.Vector2ClampValue(b.Velocity, 0, b.MaxVelocity)
+		move = rl.Vector2ClampValue(move, 0, b.MaxVelocity)
 	}
-	b.Position = rl.Vector2Add(b.Position, b.Velocity)
+	b.Position = rl.Vector2Add(b.Position, move)
 }

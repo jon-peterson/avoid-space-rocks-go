@@ -15,17 +15,17 @@ var instance *Game
 // Constants for gameplay feel
 const (
 	shipRotateSpeed float32 = math.Pi * 3 // 1.5 rotations per second
-	shipMaxSpeed    float32 = 10.0        // 20 units per second
-	shipDecaySpeed  float32 = 1.5         // units per second slower
-	shipFuelBoost   float32 = 10.0        // units per second added to acceleration
+	shipMaxSpeed    float32 = 250.0
+	shipDecaySpeed  float32 = 2.0
+	shipFuelBoost   float32 = 50.0
 
-	bulletSpeed      float32 = 20.0 // units per second
+	bulletSpeed      float32 = 500.0
 	bulletLifetimeMs uint16  = 1000
 
-	shrapnelMaxSpeed  float32 = 6.0          // units per second
+	shrapnelMaxSpeed  float32 = 500.0
 	shrapnelMaxRotate float32 = math.Pi * 12 // 6 rotations per second
 
-	rockMaxSpeed  float32 = 10.0
+	rockMaxSpeed  float32 = 200.0
 	rockMaxRotate float32 = math.Pi * 6 // 3 rotations per second
 )
 
