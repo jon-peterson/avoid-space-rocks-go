@@ -121,7 +121,7 @@ func (r *Rock) OnDestruction(bulletVelocity rl.Vector2) error {
 	// Spawn shrapnel in random directions and lifespans
 	sheet := gameobjects.LoadSpriteSheet("shrapnel.png", 5, 1)
 	for range utils.RndInt32InRange(int32(r.size)+2, int32(r.size*2)+4) {
-		frame := int(utils.RndInt32InRange(0, 3))
+		frame := int(utils.RndInt32InRange(0, 4))
 		shrapnel := NewShrapnel(r.Position, sheet, uint16(utils.RndInt32InRange(300, 600)), frame)
 		game.World.Objects.Add(&shrapnel)
 	}
