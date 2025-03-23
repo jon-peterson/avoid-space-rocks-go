@@ -20,10 +20,10 @@ func NewAudioManager() *AudioManager {
 
 func (mgr *AudioManager) eventMappings() []eventMapping {
 	return []eventMapping{
-		{"rock:destroyed", mgr.RockExplosionHandler},
-		{"spaceship:fire", mgr.SpaceshipFireHandler},
-		{"spaceship:enter_hyperspace", mgr.SpaceshipEnterHyperspaceHandler},
-		{"spaceship:destroyed", mgr.SpaceshipExplosionHandler},
+		{"rock:destroyed", mgr.rockExplosionHandler},
+		{"spaceship:fire", mgr.spaceshipFireHandler},
+		{"spaceship:enter_hyperspace", mgr.spaceshipEnterHyperspaceHandler},
+		{"spaceship:destroyed", mgr.spaceshipExplosionHandler},
 	}
 }
 
@@ -47,7 +47,7 @@ func (mgr *AudioManager) Deregister(game *core.Game) error {
 	return nil
 }
 
-func (mgr *AudioManager) RockExplosionHandler(size core.RockSize) {
+func (mgr *AudioManager) rockExplosionHandler(size core.RockSize) {
 	switch size {
 	case core.RockTiny:
 		_ = mgr.playSound("explosion_tiny.wav")
@@ -60,15 +60,15 @@ func (mgr *AudioManager) RockExplosionHandler(size core.RockSize) {
 	}
 }
 
-func (mgr *AudioManager) SpaceshipFireHandler() {
+func (mgr *AudioManager) spaceshipFireHandler() {
 	_ = mgr.playSound("fire.wav")
 }
 
-func (mgr *AudioManager) SpaceshipExplosionHandler() {
+func (mgr *AudioManager) spaceshipExplosionHandler() {
 	_ = mgr.playSound("explosion_ship.wav")
 }
 
-func (mgr *AudioManager) SpaceshipEnterHyperspaceHandler() {
+func (mgr *AudioManager) spaceshipEnterHyperspaceHandler() {
 	_ = mgr.playSound("hyperspace.wav")
 }
 

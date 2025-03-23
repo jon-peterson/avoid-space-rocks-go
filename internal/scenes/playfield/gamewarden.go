@@ -12,9 +12,9 @@ type GameWarden struct {
 
 func (gw *GameWarden) eventMappings() []eventMapping {
 	return []eventMapping{
-		{"rock:destroyed", gw.EnemyDestroyedWatcher},
-		{"spaceship:destroyed", gw.SpaceshipDestroyedWatcher},
-		{"spaceship:enter_hyperspace", gw.SpaceshipHyperspaceWatcher},
+		{"rock:destroyed", gw.enemyDestroyedWatcher},
+		{"spaceship:destroyed", gw.spaceshipDestroyedWatcher},
+		{"spaceship:enter_hyperspace", gw.spaceshipHyperspaceWatcher},
 	}
 }
 
@@ -43,9 +43,9 @@ func (gw *GameWarden) Deregister(game *core.Game) error {
 	return nil
 }
 
-// EnemyDestroyedWatcher is called when an enemy is destroyed. If the level no longer has any live
+// enemyDestroyedWatcher is called when an enemy is destroyed. If the level no longer has any live
 // enemies, then it runs the next level.
-func (gw *GameWarden) EnemyDestroyedWatcher(_ core.RockSize) {
+func (gw *GameWarden) enemyDestroyedWatcher(_ core.RockSize) {
 	// If all rocks are done we can launch the next level
 	if !gw.game.World.Objects.HasRemainingEnemies() {
 		go gw.game.StartLevel()
@@ -55,7 +55,7 @@ func (gw *GameWarden) EnemyDestroyedWatcher(_ core.RockSize) {
 // SpaceshipDestroyedWatcher is called when the spaceship is destroyed. It decrements the lives
 // remaining, waits a moment, and then respawns the spaceship. If the player is out of lives it goes to
 // game over state.
-func (gw *GameWarden) SpaceshipDestroyedWatcher() {
+func (gw *GameWarden) spaceshipDestroyedWatcher() {
 	gw.game.Lives--
 	time.Sleep(4 * time.Second)
 	if gw.game.Lives > 0 {
@@ -68,7 +68,7 @@ func (gw *GameWarden) SpaceshipDestroyedWatcher() {
 
 // SpaceshipHyperspaceWatcher moves the spaceship to a random location with some graphic flair.
 // The audio clip is two seconds but the re-entry clack is at 1.9 seconds, so adjust accordingly.
-func (gw *GameWarden) SpaceshipHyperspaceWatcher() {
+func (gw *GameWarden) spaceshipHyperspaceWatcher() {
 	s := &gw.game.World.Spaceship
 	// Stop the spaceship and put it in hyperspace
 	s.InHyperspace = true
