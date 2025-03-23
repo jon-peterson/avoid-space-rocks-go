@@ -44,6 +44,13 @@ func (w *World) Wraparound(p rl.Vector2) rl.Vector2 {
 	return p
 }
 
+// IsOutsideEdges returns true if the given position is outside the edges of the playfield
+func (w *World) IsOutsideEdges(p rl.Vector2) bool {
+	return p.X < 0 || p.X > w.Width || p.Y < 0 || p.Y > w.Height
+}
+
+// RandomBorderPosition returns a random position on the border of the playfield, each
+// equally likely.
 func (w *World) RandomBorderPosition() rl.Vector2 {
 	if random.Chance(0.5) {
 		return rl.Vector2{
@@ -57,6 +64,7 @@ func (w *World) RandomBorderPosition() rl.Vector2 {
 	}
 }
 
+// RandomPosition returns a random position within the playfield.
 func (w *World) RandomPosition() rl.Vector2 {
 	return rl.Vector2{
 		X: random.RndFloat32(w.Width),
