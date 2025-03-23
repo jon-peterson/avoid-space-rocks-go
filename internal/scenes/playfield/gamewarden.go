@@ -48,6 +48,7 @@ func (gw *GameWarden) Deregister(game *core.Game) error {
 func (gw *GameWarden) enemyDestroyedWatcher(_ core.RockSize) {
 	// If all rocks are done we can launch the next level
 	if !gw.game.World.Objects.HasRemainingEnemies() {
+		gw.game.StopLevel()
 		go gw.game.StartLevel()
 	}
 }

@@ -3,7 +3,9 @@ package core
 import (
 	"avoid_the_space_rocks/internal/gameobjects"
 	"avoid_the_space_rocks/internal/utils"
+	"context"
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"time"
 )
 
 type AlienSize int
@@ -95,12 +97,70 @@ func (a *Alien) OnDestruction(bulletVelocity rl.Vector2) error {
 	// Spawn shrapnel in random directions and lifespans
 	sheet := gameobjects.LoadSpriteSheet("shrapnel.png", 5, 1)
 	for range 6 {
-		frame := int(utils.RndInt32InRange(0, 3))
+		frame := int(utils.RndInt32InRange(0, 4))
 		shrapnel := NewShrapnel(a.Position, sheet, uint16(utils.RndInt32InRange(200, 400)), frame)
 		game.World.Objects.Add(&shrapnel)
 	}
 	// Notify other services
 	game.EventBus.Publish("alien:destroyed", a.size)
-
 	return nil
+}
+
+// AlienSpawner adds new aliens to the playfield at an appropriate rate
+func AlienSpawner(ctx context.Context) {
+	rl.TraceLog(rl.LogInfo, "AlienSpawner starting")
+	tickerStep := time.Millisecond * 250
+	ticker := time.NewTicker(tickerStep)
+	defer ticker.Stop()
+
+	// Decide how frequently we should spawn aliens
+	game := GetGame()
+	var alien *Alien = nil
+	var sinceLastSpawn time.Duration = 0.0
+	spawnDelay := time.Second * max(1, time.Duration(3-game.Level))
+
+	for {
+		select {
+		case <-ctx.Done():
+			rl.TraceLog(rl.LogInfo, "AlienSpawner exiting")
+			return
+
+		case <-ticker.C:
+
+			if game.Paused {
+				continue
+			}
+
+			if alien != nil {
+				if alien.IsAlive() {
+					// There's already an active alien in the level; let it run
+					continue
+				}
+				rl.TraceLog(rl.LogInfo, "Alien no longer on playfield; eligible to spawn a new one")
+				alien = nil
+				sinceLastSpawn = 0.0
+			}
+
+			sinceLastSpawn += tickerStep
+			if sinceLastSpawn < spawnDelay {
+				// Wait a bit longer
+				continue
+			}
+
+			// Spawn a new alien
+			rl.TraceLog(rl.LogInfo, "Spawning new alien")
+			position := game.World.RandomBorderPosition()
+			spawnedAlien := NewAlien(AlienBig, position)
+
+			// Point the alien towards the target
+			target := game.World.RandomPosition()
+			spawnedAlien.MaxVelocity = alienBigMaxSpeed
+			spawnedAlien.Velocity = rl.Vector2Normalize(rl.Vector2Subtract(target, spawnedAlien.Position))
+			spawnedAlien.Velocity = rl.Vector2Scale(spawnedAlien.Velocity, alienBigMaxSpeed)
+
+			alien = &spawnedAlien
+			game.World.Objects.Add(alien)
+			sinceLastSpawn = 0.0
+		}
+	}
 }
