@@ -108,15 +108,18 @@ func (r *Rock) OnDestruction(bulletVelocity rl.Vector2) error {
 	// Spawn smaller rocks at same location as appropriate for level
 	if int32(r.size) > max(0, 4-game.Level) {
 		for range utils.RndInt32InRange(2, max(3, int32(game.Level/2))) {
-			// Spawn a new rock at the same position as the old one but a bit back
-			newRock := NewRock(r.size-1, rl.Vector2Add(r.Position, bulletVelocity))
+			// Spawn a new rock at the same position as the old one but a bit away from dir of the bullet
+			newRock := NewRock(r.size-1, r.Position)
+			spriteWidth := newRock.spritesheet.GetRectangle(newRock.Position).Width / 2
+			scaledBulletVelocity := rl.Vector2Scale(rl.Vector2Normalize(bulletVelocity), spriteWidth)
+			newRock.Position = rl.Vector2Add(newRock.Position, scaledBulletVelocity)
 			game.World.Objects.Add(&newRock)
 			// Add a bit of bullet velocity to each new rock so more likely moving away
 			newRock.Velocity = rl.Vector2Add(newRock.Velocity, rl.Vector2Scale(bulletVelocity, 0.1))
 		}
 	}
 	// Spawn shrapnel in random directions and lifespans
-	sheet := gameobjects.LoadSpriteSheet("shrapnel.png", 4, 1)
+	sheet := gameobjects.LoadSpriteSheet("shrapnel.png", 5, 1)
 	for range utils.RndInt32InRange(int32(r.size)+2, int32(r.size*2)+4) {
 		frame := int(utils.RndInt32InRange(0, 3))
 		shrapnel := NewShrapnel(r.Position, sheet, uint16(utils.RndInt32InRange(300, 600)), frame)
