@@ -61,6 +61,7 @@ func (a *Alien) Update() error {
 	if game.World.IsOutsideEdges(a.Position) {
 		// If the alien goes outside the edges, we just remove it from the game
 		a.isAlive = false
+		game.EventBus.Publish("alien:left_playfield", a.size)
 	}
 	return nil
 }
@@ -102,7 +103,7 @@ func (a *Alien) OnCollision(other gameobjects.Collidable) error {
 }
 
 // OnDestruction handles the destruction of the alien.
-func (a *Alien) OnDestruction(bulletVelocity rl.Vector2) error {
+func (a *Alien) OnDestruction(_ rl.Vector2) error {
 	game := GetGame()
 	a.isAlive = false
 	// Spawn shrapnel in random directions and lifespans

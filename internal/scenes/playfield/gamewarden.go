@@ -13,7 +13,8 @@ type GameWarden struct {
 func (gw *GameWarden) eventMappings() []eventMapping {
 	return []eventMapping{
 		{"rock:destroyed", gw.rockDestroyedWatcher},
-		{"alien:destroyed", gw.alienDestroyedWatcher},
+		{"alien:destroyed", gw.alienRemovedWatcher},
+		{"alien:left_playfield", gw.alienRemovedWatcher},
 		{"spaceship:destroyed", gw.spaceshipDestroyedWatcher},
 		{"spaceship:enter_hyperspace", gw.spaceshipHyperspaceWatcher},
 	}
@@ -49,8 +50,8 @@ func (gw *GameWarden) rockDestroyedWatcher(_ core.RockSize) {
 	gw.checkEndOfLevel()
 }
 
-// alienDestroyedWatcher is called when a rock is destroyed. Calls the end-of-level check.
-func (gw *GameWarden) alienDestroyedWatcher(_ core.AlienSize) {
+// alienDestroyedWatcher is called when an alien is destroyed or leaves the playfield. Calls the end-of-level check.
+func (gw *GameWarden) alienRemovedWatcher(_ core.AlienSize) {
 	gw.checkEndOfLevel()
 }
 
