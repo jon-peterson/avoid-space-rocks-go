@@ -113,6 +113,16 @@ func (s *SpriteSheet) frame(row, col int) (rl.Rectangle, error) {
 	}, nil
 }
 
+// FrameLocation returns the rectangle for the frame assuming row-first ordering
+func (s *SpriteSheet) FrameLocation(f int) (int, int, error) {
+	if f < 0 || f >= int(s.rows*s.cols) {
+		return 0, 0, fmt.Errorf("frame %d is out of bounds", f)
+	}
+	row := f / int(s.cols)
+	col := f % int(s.cols)
+	return row, col, nil
+}
+
 // GetSize returns the size of the sprite in pixels as a vector
 func (s *SpriteSheet) GetSize() rl.Vector2 {
 	return rl.Vector2{
