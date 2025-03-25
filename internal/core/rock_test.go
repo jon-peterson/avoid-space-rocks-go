@@ -49,6 +49,20 @@ func TestRock_OnSpaceshipCollision(t *testing.T) {
 	}
 }
 
+func TestRock_OnAlienCollision(t *testing.T) {
+	rock := NewRock(RockMedium, rl.NewVector2(100, 100))
+	alien := NewAlien(AlienBig, rl.NewVector2(100, 100))
+
+	err := rock.OnCollision(&alien)
+	if err != nil {
+		t.Errorf("Unexpected error during collision: %v", err)
+	}
+
+	if alien.IsAlive() {
+		t.Errorf("Expected alien to be destroyed after collision")
+	}
+}
+
 func TestRock_OnDestruction(t *testing.T) {
 
 	// To start assert the game has no small rocks

@@ -97,6 +97,10 @@ func (r *Rock) OnCollision(other gameobjects.Collidable) error {
 	if ok {
 		return s.OnDestruction(r.Velocity)
 	}
+	a, ok := other.(*Alien)
+	if ok {
+		return a.OnDestruction(r.Velocity)
+	}
 	return nil
 }
 
