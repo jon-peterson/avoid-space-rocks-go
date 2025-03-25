@@ -26,7 +26,6 @@ func NewShrapnel(position rl.Vector2, sheet *gameobjects.SpriteSheet, lifespan u
 				X: utils.RndFloat32InRange(-shrapnelMaxSpeed, shrapnelMaxSpeed),
 				Y: utils.RndFloat32InRange(-shrapnelMaxSpeed, shrapnelMaxSpeed),
 			},
-			MaxVelocity: shrapnelMaxSpeed,
 			Transform: gameobjects.Transform{
 				Position: position,
 				Rotation: rl.Vector2{

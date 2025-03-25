@@ -176,7 +176,6 @@ func AlienSpawner(ctx context.Context) {
 
 			// Point the alien towards the target
 			target := game.World.RandomPosition()
-			spawnedAlien.MaxVelocity = alienBigMaxSpeed
 			spawnedAlien.Velocity = rl.Vector2Normalize(rl.Vector2Subtract(target, spawnedAlien.Position))
 			spawnedAlien.Velocity = rl.Vector2Scale(spawnedAlien.Velocity, alienBigMaxSpeed)
 

@@ -16,7 +16,7 @@ var instance *Game
 // Constants for gameplay feel
 const (
 	shipRotateSpeed float32 = math.Pi * 3 // 1.5 rotations per second
-	shipMaxSpeed    float32 = 250.0
+	shipMaxSpeed    float32 = 15.0
 	shipDecaySpeed  float32 = 2.0
 	shipFuelBoost   float32 = 40.0
 
@@ -29,8 +29,8 @@ const (
 	rockMaxSpeed  float32 = 200.0
 	rockMaxRotate float32 = math.Pi * 6 // 3 rotations per second
 
-	alienSmallMaxSpeed float32 = 250.0
-	alienBigMaxSpeed   float32 = 100.0
+	alienSmallMaxSpeed float32 = 300.0
+	alienBigMaxSpeed   float32 = 150.0
 )
 
 type Game struct {

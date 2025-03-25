@@ -12,16 +12,18 @@ type Rigidbody struct {
 	MaxVelocity  float32 // The maximum magnitude of the velocity vector
 }
 
-func (b *Rigidbody) String() string {
-	return fmt.Sprintf("vel (%f,%f)", b.Velocity.X, b.Velocity.Y)
+func (rb *Rigidbody) String() string {
+	return fmt.Sprintf("vel (%f,%f)", rb.Velocity.X, rb.Velocity.Y)
 }
 
-func (b *Rigidbody) ApplyPhysics() {
+// ApplyPhysics applies acceleration to the velocity and then moves the object
+func (rb *Rigidbody) ApplyPhysics() {
 	delta := rl.GetFrameTime()
-	b.Velocity = rl.Vector2Add(b.Velocity, b.Acceleration)
-	move := rl.Vector2Scale(b.Velocity, delta)
-	if b.MaxVelocity > 0 {
-		move = rl.Vector2ClampValue(move, 0, b.MaxVelocity)
+	rb.Velocity = rl.Vector2Add(rb.Velocity, rb.Acceleration)
+	if rb.MaxVelocity > 0 {
+		// TODO: fix this; it's not applying max velocity correctly
+		rb.Velocity = rl.Vector2ClampValue(rb.Velocity, 0, rb.MaxVelocity)
 	}
-	b.Position = rl.Vector2Add(b.Position, move)
+	move := rl.Vector2Scale(rb.Velocity, delta)
+	rb.Position = rl.Vector2Add(rb.Position, move)
 }
