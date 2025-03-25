@@ -91,8 +91,8 @@ func (a *Alien) GetHitbox() rl.Rectangle {
 	return a.spritesheet.GetRectangle(a.Position)
 }
 
-// OnCollision handles the collision with another Collidable object.
-// TODO: Handle collision with rocks, which should destroy the alien
+// OnCollision handles the collision with another Collidable object. Aliens can blow up
+// spaceships only; they are in turn destroyed by rocks.
 func (a *Alien) OnCollision(other gameobjects.Collidable) error {
 	s, ok := other.(*Spaceship)
 	if ok {
