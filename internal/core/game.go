@@ -2,6 +2,7 @@ package core
 
 import (
 	"avoid_the_space_rocks/internal/utils"
+	"context"
 	"fmt"
 	evbus "github.com/asaskevich/EventBus"
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -27,6 +28,9 @@ const (
 
 	rockMaxSpeed  float32 = 200.0
 	rockMaxRotate float32 = math.Pi * 6 // 3 rotations per second
+
+	alienSmallMaxSpeed float32 = 250.0
+	alienBigMaxSpeed   float32 = 100.0
 )
 
 type Game struct {
@@ -44,6 +48,8 @@ type Game struct {
 	Observers []EventObserver
 
 	Overlay func()
+
+	levelOver context.CancelFunc
 }
 
 type EventObserver interface {
@@ -72,9 +78,12 @@ func InitGame(screenWidth, screenHeight float32) *Game {
 	return instance
 }
 
-// StartLevel initializes the level.
+// StartLevel kicks off a new level. Run this as a goroutine so that the physics
+// engine and everything keeps running.
 func (g *Game) StartLevel() {
 	g.Level += 1
+
+	// Display the level number for a few seconds
 	rl.TraceLog(rl.LogInfo, fmt.Sprintf("Starting level %d", g.Level))
 	g.Overlay = func() {
 		utils.CenterText(fmt.Sprintf("Level %d", g.Level), rl.Vector2{X: g.World.Width / 2, Y: g.World.Height / 3}, 60)
@@ -82,10 +91,22 @@ func (g *Game) StartLevel() {
 	time.Sleep(time.Second * 2)
 	g.Overlay = nil
 	time.Sleep(time.Millisecond * 500)
+
+	// Kick off the alien spawner
+	ctx, cancel := context.WithCancel(context.Background())
+	g.levelOver = cancel
+	go AlienSpawner(ctx)
+
+	// Spawn the appropriate number of rocks
 	for range g.Level + 3 {
 		rock := NewRock(RockBig, g.World.RandomBorderPosition())
 		g.World.Objects.Add(&rock)
 	}
+}
+
+// StopLevel runs the end of level logic
+func (g *Game) StopLevel() {
+	g.levelOver()
 }
 
 // GameOver is called when the player has no more lives.

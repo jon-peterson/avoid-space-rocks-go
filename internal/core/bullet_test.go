@@ -37,7 +37,7 @@ func TestBullet_GetHitbox(t *testing.T) {
 	}
 }
 
-func TestBullet_OnCollision(t *testing.T) {
+func TestBullet_OnCollisionWithRock(t *testing.T) {
 	bullet := NewBullet(rl.NewVector2(0, 0), rl.NewVector2(0, 0))
 	rock := NewRock(RockBig, rl.NewVector2(0, 0))
 	err := bullet.OnCollision(&rock)
@@ -48,6 +48,25 @@ func TestBullet_OnCollision(t *testing.T) {
 	// Check if the rock is destroyed after collision
 	if rock.IsAlive() {
 		t.Errorf("Expected rock to be destroyed after collision")
+	}
+
+	// Check if the bullet is still alive after collision
+	if bullet.IsAlive() {
+		t.Errorf("Expected bullet to be destroyed after collision")
+	}
+}
+
+func TestBullet_OnCollisionWithAlien(t *testing.T) {
+	bullet := NewBullet(rl.NewVector2(0, 0), rl.NewVector2(0, 0))
+	alien := NewAlien(AlienBig, rl.NewVector2(0, 0))
+	err := bullet.OnCollision(&alien)
+	if err != nil {
+		t.Errorf("Unexpected error during collision: %v", err)
+	}
+
+	// Check if the alien is destroyed after collision
+	if alien.IsAlive() {
+		t.Errorf("Expected alien to be destroyed after collision")
 	}
 
 	// Check if the bullet is still alive after collision

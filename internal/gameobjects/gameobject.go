@@ -17,6 +17,10 @@ type Collidable interface {
 	GetHitbox() rl.Rectangle
 }
 
+type Destructible interface {
+	OnDestruction(direction rl.Vector2) error
+}
+
 type GameObjectCollection struct {
 	objects        []GameObject
 	newObjects     []GameObject

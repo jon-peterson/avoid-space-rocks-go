@@ -34,6 +34,22 @@ func TestRock_GetHitbox(t *testing.T) {
 	}
 }
 
+func TestRock_OnRockCollision(t *testing.T) {
+	rock := NewRock(RockMedium, rl.NewVector2(100, 100))
+	rock2 := NewRock(RockSmall, rl.NewVector2(100, 100))
+
+	err := rock.OnCollision(&rock2)
+	if err != nil {
+		t.Errorf("Unexpected error during collision: %v", err)
+	}
+	if !rock.isAlive {
+		t.Errorf("Expected rock to be alive after collision")
+	}
+	if !rock2.isAlive {
+		t.Errorf("Expected rock2 to be alive after collision")
+	}
+}
+
 func TestRock_OnSpaceshipCollision(t *testing.T) {
 	rock := NewRock(RockMedium, rl.NewVector2(100, 100))
 	spaceship := NewSpaceship()
@@ -46,6 +62,20 @@ func TestRock_OnSpaceshipCollision(t *testing.T) {
 
 	if spaceship.IsAlive() {
 		t.Errorf("Expected spaceship to be destroyed after collision")
+	}
+}
+
+func TestRock_OnAlienCollision(t *testing.T) {
+	rock := NewRock(RockMedium, rl.NewVector2(100, 100))
+	alien := NewAlien(AlienBig, rl.NewVector2(100, 100))
+
+	err := rock.OnCollision(&alien)
+	if err != nil {
+		t.Errorf("Unexpected error during collision: %v", err)
+	}
+
+	if alien.IsAlive() {
+		t.Errorf("Expected alien to be destroyed after collision")
 	}
 }
 

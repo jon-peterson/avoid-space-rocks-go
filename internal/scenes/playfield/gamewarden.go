@@ -12,7 +12,8 @@ type GameWarden struct {
 
 func (gw *GameWarden) eventMappings() []eventMapping {
 	return []eventMapping{
-		{"rock:destroyed", gw.enemyDestroyedWatcher},
+		{"rock:destroyed", gw.rockDestroyedWatcher},
+		{"alien:destroyed", gw.alienDestroyedWatcher},
 		{"spaceship:destroyed", gw.spaceshipDestroyedWatcher},
 		{"spaceship:enter_hyperspace", gw.spaceshipHyperspaceWatcher},
 	}
@@ -43,11 +44,20 @@ func (gw *GameWarden) Deregister(game *core.Game) error {
 	return nil
 }
 
-// enemyDestroyedWatcher is called when an enemy is destroyed. If the level no longer has any live
-// enemies, then it runs the next level.
-func (gw *GameWarden) enemyDestroyedWatcher(_ core.RockSize) {
-	// If all rocks are done we can launch the next level
+// rockDestroyedWatcher is called when a rock is destroyed. Calls the end-of-level check.
+func (gw *GameWarden) rockDestroyedWatcher(_ core.RockSize) {
+	gw.checkEndOfLevel()
+}
+
+// alienDestroyedWatcher is called when a rock is destroyed. Calls the end-of-level check.
+func (gw *GameWarden) alienDestroyedWatcher(_ core.AlienSize) {
+	gw.checkEndOfLevel()
+}
+
+// checkEndOfLevel sees if there are remaining enemies; if not, it starts the next level.
+func (gw *GameWarden) checkEndOfLevel() {
 	if !gw.game.World.Objects.HasRemainingEnemies() {
+		gw.game.StopLevel()
 		go gw.game.StartLevel()
 	}
 }

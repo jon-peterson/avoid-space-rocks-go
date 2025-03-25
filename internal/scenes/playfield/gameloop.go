@@ -117,12 +117,6 @@ func render() {
 
 	game.World.Objects.Draw()
 
-	if game.Paused {
-		utils.CenterText("PAUSED", rl.Vector2{X: game.World.Width / 2, Y: game.World.Height / 3}, 40)
-	} else if game.Overlay != nil {
-		game.Overlay()
-	}
-
 	rl.EndDrawing()
 }
 
@@ -139,5 +133,11 @@ func drawHud() {
 		if err := game.World.Spaceship.Spritesheet.Draw(0, 0, pos, rl.Vector2{X: 0, Y: -1}); err != nil {
 			rl.TraceLog(rl.LogError, "error drawing spaceship for lives: %v", err)
 		}
+	}
+
+	if game.Paused {
+		utils.CenterText("PAUSED", rl.Vector2{X: game.World.Width / 2, Y: game.World.Height / 3}, 40)
+	} else if game.Overlay != nil {
+		game.Overlay()
 	}
 }

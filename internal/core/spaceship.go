@@ -16,6 +16,7 @@ type Spaceship struct {
 }
 
 var _ gameobjects.Collidable = (*Spaceship)(nil)
+var _ gameobjects.Destructible = (*Spaceship)(nil)
 var _ gameobjects.GameObject = (*Spaceship)(nil)
 
 func NewSpaceship() Spaceship {
@@ -85,8 +86,14 @@ func (s *Spaceship) RotateRight() {
 
 // Fire creates a new bullet with the spaceship's current position and rotation
 func (s *Spaceship) Fire() {
-	b := NewBullet(s.Position, s.Rotation)
+	// Create the starting position of the bullet so it's outside of the hitbox
+	hitbox := s.GetHitbox()
+	bulletOffset := float32(math.Max(float64(hitbox.Width), float64(hitbox.Height))) / 2
+	startPos := rl.Vector2Add(s.Position, rl.Vector2Scale(s.Rotation, bulletOffset))
+
+	b := NewBullet(startPos, s.Rotation)
 	b.Velocity = rl.Vector2Add(rl.Vector2Scale(s.Rotation, bulletSpeed), s.Velocity)
+
 	game := GetGame()
 	game.World.Objects.Add(&b)
 	game.EventBus.Publish("spaceship:fire")
