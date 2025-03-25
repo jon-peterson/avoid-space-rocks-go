@@ -1,8 +1,10 @@
 package gameover
 
 import (
+	"avoid_the_space_rocks/internal/core"
 	"avoid_the_space_rocks/internal/scenes"
 	"avoid_the_space_rocks/internal/utils"
+	"github.com/dustin/go-humanize"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"time"
 )
@@ -34,6 +36,11 @@ func (am *GameOverMode) Loop() scenes.SceneCode {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
 		utils.CenterText("Game Over", rl.Vector2{X: am.width / 2, Y: am.height / 3}, 80)
+
+		score := humanize.Comma(int64(core.GetGame().Score))
+		utils.CenterText("Your Score", rl.Vector2{X: am.width / 2, Y: am.height / 2}, 30)
+		utils.CenterText(score, rl.Vector2{X: am.width / 2, Y: am.height/2 + 30}, 50)
+
 		rl.EndDrawing()
 	}
 
