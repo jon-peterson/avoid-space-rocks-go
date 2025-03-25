@@ -5,6 +5,7 @@ import (
 	"avoid_the_space_rocks/internal/utils"
 	"context"
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"math"
 	"time"
 )
 
@@ -15,10 +16,13 @@ const (
 	AlienBig
 )
 
-// Create a constant array of four string elements
-var alienSpriteFile = []string{
-	"alien_small.png",
-	"alien_big.png",
+// The sprite file specifies filename, rows, and columns
+var alienSpriteFile = []struct {
+	filename string
+	row, col int32
+}{
+	{"alien_small.png", 3, 3},
+	{"alien_big.png", 2, 2},
 }
 
 // Alien spaceships
@@ -33,7 +37,8 @@ var _ gameobjects.Collidable = (*Alien)(nil)
 var _ gameobjects.GameObject = (*Alien)(nil)
 
 func NewAlien(size AlienSize, position rl.Vector2) Alien {
-	sheet := gameobjects.LoadSpriteSheet(alienSpriteFile[size], 1, 1)
+	spriteFile := alienSpriteFile[size]
+	sheet := gameobjects.LoadSpriteSheet(spriteFile.filename, spriteFile.row, spriteFile.col)
 	alien := Alien{
 		spritesheet: sheet,
 		Rigidbody: gameobjects.Rigidbody{
@@ -61,8 +66,13 @@ func (a *Alien) Update() error {
 
 // Draw renders the alien  to the screen
 func (a *Alien) Draw() error {
-	// TODO: add some sort of animation
-	return a.spritesheet.Draw(0, 0, a.Position, a.Rotation)
+	row, col, err := a.spritesheet.FrameLocation(a.frameIndex())
+	if err != nil {
+		rl.TraceLog(rl.LogError, "Error getting alien frame location: %v", err)
+		row = 0
+		col = 0
+	}
+	return a.spritesheet.Draw(row, col, a.Position, a.Rotation)
 }
 
 // IsAlive returns whether the alien is alive or not
@@ -104,6 +114,17 @@ func (a *Alien) OnDestruction(bulletVelocity rl.Vector2) error {
 	// Notify other services
 	game.EventBus.Publish("alien:destroyed", a.size)
 	return nil
+}
+
+// frameIndex returns the index of the correct frame to use given the current time
+func (a *Alien) frameIndex() int {
+	// AlienBig is 2x2; AlienSmall is 3x3 but only 7 frames
+	frameCount := 4
+	if a.size == AlienSmall {
+		frameCount = 7
+	}
+	halfSeconds := int(math.Floor(rl.GetTime() * 2))
+	return halfSeconds % frameCount
 }
 
 // AlienSpawner adds new aliens to the playfield at an appropriate rate
