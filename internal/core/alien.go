@@ -171,13 +171,25 @@ func AlienSpawner(ctx context.Context) {
 
 			// Spawn a new alien
 			rl.TraceLog(rl.LogInfo, "Spawning new alien")
+			size := AlienBig
+			if game.Level > 2 && utils.RndInt32InRange(0, 10) < game.Level {
+				size = AlienSmall
+			}
+
 			position := game.World.RandomBorderPosition()
-			spawnedAlien := NewAlien(AlienBig, position)
+			spawnedAlien := NewAlien(size, position)
 
 			// Point the alien towards the target
 			target := game.World.RandomPosition()
 			spawnedAlien.Velocity = rl.Vector2Normalize(rl.Vector2Subtract(target, spawnedAlien.Position))
-			spawnedAlien.Velocity = rl.Vector2Scale(spawnedAlien.Velocity, alienBigMaxSpeed)
+
+			if size == AlienSmall {
+				sp := utils.RndFloat32InRange(alienSmallMaxSpeed/2, alienSmallMaxSpeed)
+				spawnedAlien.Velocity = rl.Vector2Scale(spawnedAlien.Velocity, sp)
+			} else {
+				sp := utils.RndFloat32InRange(alienBigMaxSpeed/2, alienBigMaxSpeed)
+				spawnedAlien.Velocity = rl.Vector2Scale(spawnedAlien.Velocity, sp)
+			}
 
 			alien = &spawnedAlien
 			game.World.Objects.Add(alien)
