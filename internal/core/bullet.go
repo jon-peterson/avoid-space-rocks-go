@@ -67,11 +67,9 @@ func (b *Bullet) GetHitbox() rl.Rectangle {
 
 // OnCollision handles the collision of the bullet with another object.
 func (b *Bullet) OnCollision(other gameobjects.Collidable) error {
-	// Bullets can only destroy rocks
-	rock, ok := other.(*Rock)
-	if ok {
+	if destructible, ok := other.(gameobjects.Destructible); ok {
 		b.isAlive = false
-		return rock.OnDestruction(b.Velocity)
+		return destructible.OnDestruction(b.Velocity)
 	}
 	return nil
 }

@@ -34,6 +34,7 @@ type Alien struct {
 }
 
 var _ gameobjects.Collidable = (*Alien)(nil)
+var _ gameobjects.Destructible = (*Alien)(nil)
 var _ gameobjects.GameObject = (*Alien)(nil)
 
 func NewAlien(size AlienSize, position rl.Vector2) Alien {

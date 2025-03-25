@@ -33,6 +33,7 @@ type Rock struct {
 }
 
 var _ gameobjects.Collidable = (*Rock)(nil)
+var _ gameobjects.Destructible = (*Rock)(nil)
 var _ gameobjects.GameObject = (*Rock)(nil)
 
 func NewRock(size RockSize, position rl.Vector2) Rock {
@@ -91,15 +92,14 @@ func (r *Rock) GetHitbox() rl.Rectangle {
 	return r.spritesheet.GetRectangle(r.Position)
 }
 
-// OnCollision handles the collision with another Collidable object.
+// OnCollision handles the collision of the rock with another Collidable object. If object
+// is destructible it destroys it -- unless it's a rock; rocks don't destroy rocks in this game.
 func (r *Rock) OnCollision(other gameobjects.Collidable) error {
-	s, ok := other.(*Spaceship)
-	if ok {
-		return s.OnDestruction(r.Velocity)
-	}
-	a, ok := other.(*Alien)
-	if ok {
-		return a.OnDestruction(r.Velocity)
+	if destructible, ok := other.(gameobjects.Destructible); ok {
+		if _, ok := other.(*Rock); ok {
+			return nil
+		}
+		return destructible.OnDestruction(r.Velocity)
 	}
 	return nil
 }
