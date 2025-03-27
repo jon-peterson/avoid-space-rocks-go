@@ -7,16 +7,17 @@ import (
 
 type Bullet struct {
 	gameobjects.Rigidbody
-	spritesheet *gameobjects.SpriteSheet
-	isAlive     bool
-	ageMs       uint16
+	spritesheet   *gameobjects.SpriteSheet
+	isAlive       bool
+	isPlayerFired bool
+	ageMs         uint16
 }
 
 var _ gameobjects.Collidable = (*Bullet)(nil)
 var _ gameobjects.GameObject = (*Bullet)(nil)
 
 // NewBullet creates a new bullet with a given position and velocity.
-func NewBullet(position, velocity rl.Vector2) Bullet {
+func NewBullet(position, velocity rl.Vector2, isPlayerFired bool) Bullet {
 	sheet := gameobjects.LoadSpriteSheet("bullet.png", 1, 1)
 	bullet := Bullet{
 		spritesheet: sheet,
@@ -26,8 +27,9 @@ func NewBullet(position, velocity rl.Vector2) Bullet {
 				Position: position,
 			},
 		},
-		isAlive: true,
-		ageMs:   0,
+		isPlayerFired: isPlayerFired,
+		isAlive:       true,
+		ageMs:         0,
 	}
 	return bullet
 }
@@ -55,6 +57,10 @@ func (b *Bullet) IsEnemy() bool {
 	return false
 }
 
+func (b *Bullet) IsPlayerFired() bool {
+	return b.isPlayerFired
+}
+
 // GetHitbox returns the hitbox of the bullet, used for basic collision detection.
 func (b *Bullet) GetHitbox() rl.Rectangle {
 	return rl.Rectangle{
@@ -68,6 +74,12 @@ func (b *Bullet) GetHitbox() rl.Rectangle {
 // OnCollision handles the collision of the bullet with another object.
 func (b *Bullet) OnCollision(other gameobjects.Collidable) error {
 	if destructible, ok := other.(gameobjects.Destructible); ok {
+		// If the other object is the spaceship check to see if the bullet was self-fired
+		if _, ok := other.(*Spaceship); ok {
+			if b.isPlayerFired {
+				return nil
+			}
+		}
 		b.isAlive = false
 		return destructible.OnDestruction(b.Velocity)
 	}

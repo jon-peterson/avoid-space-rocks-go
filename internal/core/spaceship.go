@@ -91,7 +91,7 @@ func (s *Spaceship) Fire() {
 	bulletOffset := float32(math.Max(float64(hitbox.Width), float64(hitbox.Height))) / 2
 	startPos := rl.Vector2Add(s.Position, rl.Vector2Scale(s.Rotation, bulletOffset))
 
-	b := NewBullet(startPos, s.Rotation)
+	b := NewBullet(startPos, s.Rotation, true)
 	b.Velocity = rl.Vector2Add(rl.Vector2Scale(s.Rotation, bulletSpeed), s.Velocity)
 
 	game := GetGame()
