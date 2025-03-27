@@ -132,15 +132,13 @@ func (a *Alien) frameIndex() int {
 // AlienSpawner adds new aliens to the playfield at an appropriate rate
 func AlienSpawner(ctx context.Context) {
 	rl.TraceLog(rl.LogInfo, "AlienSpawner starting")
-	tickerStep := time.Millisecond * 250
-	ticker := time.NewTicker(tickerStep)
-	defer ticker.Stop()
-
 	// Decide how frequently we should spawn aliens
 	game := GetGame()
 	var alien *Alien = nil
-	var sinceLastSpawn time.Duration = 0.0
 	spawnDelay := time.Second * max(1, time.Duration(3-game.Level))
+
+	ticker := time.NewTicker(spawnDelay)
+	defer ticker.Stop()
 
 	for {
 		select {
@@ -161,40 +159,60 @@ func AlienSpawner(ctx context.Context) {
 				}
 				rl.TraceLog(rl.LogInfo, "Alien no longer on playfield; eligible to spawn a new one")
 				alien = nil
-				sinceLastSpawn = 0.0
-			}
-
-			sinceLastSpawn += tickerStep
-			if sinceLastSpawn < spawnDelay {
-				// Wait a bit longer
+				// Don't spawn another right away
 				continue
 			}
 
-			// Spawn a new alien
 			rl.TraceLog(rl.LogInfo, "Spawning new alien")
-			size := AlienBig
-			if game.Level > 2 && utils.RndInt32InRange(0, 10) < game.Level {
-				size = AlienSmall
-			}
-
-			position := game.World.RandomBorderPosition()
-			spawnedAlien := NewAlien(size, position)
-
-			// Point the alien towards the target
-			target := game.World.RandomPosition()
-			spawnedAlien.Velocity = rl.Vector2Normalize(rl.Vector2Subtract(target, spawnedAlien.Position))
-
-			if size == AlienSmall {
-				sp := utils.RndFloat32InRange(alienSmallMaxSpeed/2, alienSmallMaxSpeed)
-				spawnedAlien.Velocity = rl.Vector2Scale(spawnedAlien.Velocity, sp)
-			} else {
-				sp := utils.RndFloat32InRange(alienBigMaxSpeed/2, alienBigMaxSpeed)
-				spawnedAlien.Velocity = rl.Vector2Scale(spawnedAlien.Velocity, sp)
-			}
-
-			alien = &spawnedAlien
+			alien = newSpawnedAlien(game)
 			game.World.Objects.Add(alien)
-			sinceLastSpawn = 0.0
 		}
 	}
+}
+
+func AlienRunner(ctx context.Context) {
+	rl.TraceLog(rl.LogInfo, "AlienRunner starting")
+	ticker := time.NewTicker(time.Millisecond * 100)
+	defer ticker.Stop()
+
+	game := GetGame()
+	for {
+		select {
+		case <-ctx.Done():
+			rl.TraceLog(rl.LogInfo, "AlienRunner exiting")
+			return
+
+		case <-ticker.C:
+			if game.Paused {
+				continue
+			}
+
+		}
+	}
+}
+
+// newSpawnedAlien creates and returns a new alien at a random position on the playfield, moving in a random direction
+// at the appropriate speed.
+func newSpawnedAlien(game *Game) *Alien {
+	// Spawn a new alien
+	size := AlienBig
+	if game.Level > 2 && utils.RndInt32InRange(0, 10) < game.Level {
+		size = AlienSmall
+	}
+
+	position := game.World.RandomBorderPosition()
+	spawnedAlien := NewAlien(size, position)
+
+	// Point the alien towards the target
+	target := game.World.RandomPosition()
+	spawnedAlien.Velocity = rl.Vector2Normalize(rl.Vector2Subtract(target, spawnedAlien.Position))
+
+	if size == AlienSmall {
+		sp := utils.RndFloat32InRange(alienSmallMaxSpeed/2, alienSmallMaxSpeed)
+		spawnedAlien.Velocity = rl.Vector2Scale(spawnedAlien.Velocity, sp)
+	} else {
+		sp := utils.RndFloat32InRange(alienBigMaxSpeed/2, alienBigMaxSpeed)
+		spawnedAlien.Velocity = rl.Vector2Scale(spawnedAlien.Velocity, sp)
+	}
+	return &spawnedAlien
 }
