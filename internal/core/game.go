@@ -21,7 +21,7 @@ const (
 	shipFuelBoost   float32 = 40.0
 
 	bulletSpeed      float32 = 500.0
-	bulletLifetimeMs uint16  = 1000
+	bulletLifetimeMs uint16  = 1250
 
 	shrapnelMaxSpeed  float32 = 500.0
 	shrapnelMaxRotate float32 = math.Pi * 12 // 6 rotations per second
@@ -29,8 +29,9 @@ const (
 	rockMaxSpeed  float32 = 200.0
 	rockMaxRotate float32 = math.Pi * 6 // 3 rotations per second
 
-	alienSmallMaxSpeed float32 = 300.0
-	alienBigMaxSpeed   float32 = 150.0
+	alienMaxSpeed       float32 = 300.0
+	alienMaxBulletDrift float32 = math.Pi / 2
+	alienMinShootDelay          = 500
 )
 
 type Game struct {

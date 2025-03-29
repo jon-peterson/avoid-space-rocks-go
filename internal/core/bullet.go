@@ -74,9 +74,15 @@ func (b *Bullet) GetHitbox() rl.Rectangle {
 // OnCollision handles the collision of the bullet with another object.
 func (b *Bullet) OnCollision(other gameobjects.Collidable) error {
 	if destructible, ok := other.(gameobjects.Destructible); ok {
-		// If the other object is the spaceship check to see if the bullet was self-fired
 		if _, ok := other.(*Spaceship); ok {
+			// Spaceship bullets don't destroy the spaceship
 			if b.isPlayerFired {
+				return nil
+			}
+		}
+		if _, ok := other.(*Alien); ok {
+			// Alien bullets don't destroy the alien
+			if !b.isPlayerFired {
 				return nil
 			}
 		}
