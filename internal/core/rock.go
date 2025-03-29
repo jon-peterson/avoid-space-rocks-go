@@ -55,10 +55,10 @@ func NewRock(size RockSize, position rl.Vector2) Rock {
 		rock.rotationSpeed = -rock.rotationSpeed
 	}
 	// Randomize the speed and direction
-	rock.MaxVelocity = rockMaxSpeed / float32(size+2)
+	maxSpeed := rockMaxSpeed / float32(size+2)
 	rock.Velocity = rl.Vector2{
-		X: utils.RndFloat32InRange(-rock.MaxVelocity, rock.MaxVelocity),
-		Y: utils.RndFloat32InRange(-rock.MaxVelocity, rock.MaxVelocity),
+		X: utils.RndFloat32InRange(-maxSpeed, maxSpeed),
+		Y: utils.RndFloat32InRange(-maxSpeed, maxSpeed),
 	}
 	return rock
 }

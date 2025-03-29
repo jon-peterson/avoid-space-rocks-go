@@ -31,6 +31,7 @@ type Alien struct {
 	spritesheet *gameobjects.SpriteSheet
 	isAlive     bool
 	size        AlienSize
+	bulletDrift float32
 }
 
 var _ gameobjects.Collidable = (*Alien)(nil)
@@ -61,6 +62,7 @@ func (a *Alien) Update() error {
 	if game.World.IsOutsideEdges(a.Position) {
 		// If the alien goes outside the edges, we just remove it from the game
 		a.isAlive = false
+		game.EventBus.Publish("alien:left_playfield", a.size)
 	}
 	return nil
 }
@@ -102,7 +104,7 @@ func (a *Alien) OnCollision(other gameobjects.Collidable) error {
 }
 
 // OnDestruction handles the destruction of the alien.
-func (a *Alien) OnDestruction(bulletVelocity rl.Vector2) error {
+func (a *Alien) OnDestruction(_ rl.Vector2) error {
 	game := GetGame()
 	a.isAlive = false
 	// Spawn shrapnel in random directions and lifespans
@@ -130,21 +132,24 @@ func (a *Alien) frameIndex() int {
 
 // AlienSpawner adds new aliens to the playfield at an appropriate rate
 func AlienSpawner(ctx context.Context) {
-	rl.TraceLog(rl.LogInfo, "AlienSpawner starting")
-	tickerStep := time.Millisecond * 250
-	ticker := time.NewTicker(tickerStep)
-	defer ticker.Stop()
-
+	rl.TraceLog(rl.LogDebug, "AlienSpawner starting")
 	// Decide how frequently we should spawn aliens
 	game := GetGame()
 	var alien *Alien = nil
-	var sinceLastSpawn time.Duration = 0.0
+	var runnerCtx context.Context
+	var cancelRunner context.CancelFunc
 	spawnDelay := time.Second * max(1, time.Duration(3-game.Level))
+
+	ticker := time.NewTicker(spawnDelay)
+	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ctx.Done():
-			rl.TraceLog(rl.LogInfo, "AlienSpawner exiting")
+			rl.TraceLog(rl.LogDebug, "AlienSpawner exiting")
+			if cancelRunner != nil {
+				cancelRunner()
+			}
 			return
 
 		case <-ticker.C:
@@ -158,31 +163,89 @@ func AlienSpawner(ctx context.Context) {
 					// There's already an active alien in the level; let it run
 					continue
 				}
-				rl.TraceLog(rl.LogInfo, "Alien no longer on playfield; eligible to spawn a new one")
+				rl.TraceLog(rl.LogInfo, "Alien no longer on playfield; stopping")
+				cancelRunner()
 				alien = nil
-				sinceLastSpawn = 0.0
-			}
-
-			sinceLastSpawn += tickerStep
-			if sinceLastSpawn < spawnDelay {
-				// Wait a bit longer
+				// Don't spawn another right away
 				continue
 			}
 
-			// Spawn a new alien
 			rl.TraceLog(rl.LogInfo, "Spawning new alien")
-			position := game.World.RandomBorderPosition()
-			spawnedAlien := NewAlien(AlienBig, position)
-
-			// Point the alien towards the target
-			target := game.World.RandomPosition()
-			spawnedAlien.MaxVelocity = alienBigMaxSpeed
-			spawnedAlien.Velocity = rl.Vector2Normalize(rl.Vector2Subtract(target, spawnedAlien.Position))
-			spawnedAlien.Velocity = rl.Vector2Scale(spawnedAlien.Velocity, alienBigMaxSpeed)
-
-			alien = &spawnedAlien
+			alien = newSpawnedAlien(game)
+			runnerCtx, cancelRunner = context.WithCancel(context.Background())
+			go AlienRunner(runnerCtx, alien)
 			game.World.Objects.Add(alien)
-			sinceLastSpawn = 0.0
 		}
 	}
+}
+
+func AlienRunner(ctx context.Context, alien *Alien) {
+	rl.TraceLog(rl.LogDebug, "AlienRunner starting")
+	game := GetGame()
+
+	// Small aliens shoot more frequently, and more as the level increases
+	shootDelay := 4000 - int32(300*game.Level)
+	if alien.size == AlienSmall {
+		shootDelay /= 2
+	}
+	if shootDelay < alienMinShootDelay {
+		shootDelay = alienMinShootDelay
+	}
+
+	ticker := time.NewTicker(time.Millisecond * time.Duration(shootDelay))
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			rl.TraceLog(rl.LogDebug, "AlienRunner exiting")
+			return
+
+		case <-ticker.C:
+			if game.Paused {
+				continue
+			}
+			if !game.World.Spaceship.IsAlive() {
+				continue
+			}
+			// Fire a bullet roughly towards the spaceship
+			drift := rl.NewVector2(
+				utils.RndFloat32InRange(-alien.bulletDrift, alien.bulletDrift),
+				utils.RndFloat32InRange(-alien.bulletDrift, alien.bulletDrift))
+			target := rl.Vector2Add(game.World.Spaceship.Position, drift)
+			shootAt := rl.Vector2Normalize(rl.Vector2Subtract(target, alien.Position))
+			bullet := NewBullet(alien.Position, rl.Vector2Scale(shootAt, bulletSpeed), false)
+			game.World.Objects.Add(&bullet)
+		}
+	}
+}
+
+// newSpawnedAlien returns a new alien at a random position on the playfield border, moving in
+// a random direction at the appropriate speed.
+func newSpawnedAlien(game *Game) *Alien {
+	// Spawn a new alien
+	size := AlienBig
+	if game.Level > 2 && utils.RndInt32InRange(0, 10) < game.Level {
+		size = AlienSmall
+	}
+
+	position := game.World.RandomBorderPosition()
+	spawnedAlien := NewAlien(size, position)
+
+	// Point the alien towards a random position on the playfield
+	target := game.World.RandomPosition()
+	spawnedAlien.Velocity = rl.Vector2Normalize(rl.Vector2Subtract(target, spawnedAlien.Position))
+
+	if size == AlienBig {
+		// Large aliens are slower and less accurate shooters
+		sp := utils.RndFloat32InRange(alienMaxSpeed/2, alienMaxSpeed) / 2
+		spawnedAlien.Velocity = rl.Vector2Scale(spawnedAlien.Velocity, sp)
+		spawnedAlien.bulletDrift = utils.RndFloat32(alienMaxBulletDrift)
+	} else {
+		// Small aliens are faster and more accurate shooters
+		sp := utils.RndFloat32InRange(alienMaxSpeed/2, alienMaxSpeed)
+		spawnedAlien.Velocity = rl.Vector2Scale(spawnedAlien.Velocity, sp)
+		spawnedAlien.bulletDrift = utils.RndFloat32(alienMaxBulletDrift) / 3
+	}
+	return &spawnedAlien
 }

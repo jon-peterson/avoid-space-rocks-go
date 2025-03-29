@@ -6,6 +6,7 @@ import (
 	"avoid_the_space_rocks/internal/scenes/gameover"
 	"avoid_the_space_rocks/internal/scenes/playfield"
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"os"
 )
 
 const (
@@ -21,6 +22,10 @@ func main() {
 
 	rl.SetTargetFPS(60)
 	rl.SetExitKey(rl.KeyNull)
+
+	if os.Getenv("DEBUG") != "" {
+		rl.SetTraceLogLevel(rl.LogDebug)
+	}
 
 	sceneCode := scenes.AttractModeScene
 	for sceneCode != scenes.Quit {
