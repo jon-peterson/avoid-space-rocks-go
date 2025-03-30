@@ -170,8 +170,14 @@ func AlienSpawner(ctx context.Context) {
 				continue
 			}
 
+			// Try to spawn a new alien, but if the position is occupied just skip this time around
+			position := game.World.RandomBorderPosition()
+			if game.World.Objects.IsPositionOccupied(position) {
+				continue
+			}
+
 			rl.TraceLog(rl.LogInfo, "Spawning new alien")
-			alien = newSpawnedAlien(game)
+			alien = newSpawnedAlien(game, position)
 			runnerCtx, cancelRunner = context.WithCancel(context.Background())
 			go AlienRunner(runnerCtx, alien)
 			game.World.Objects.Add(alien)
@@ -219,16 +225,14 @@ func AlienRunner(ctx context.Context, alien *Alien) {
 	}
 }
 
-// newSpawnedAlien returns a new alien at a random position on the playfield border, moving in
-// a random direction at the appropriate speed.
-func newSpawnedAlien(game *Game) *Alien {
+// newSpawnedAlien returns a new alien at the specified position, moving in a random direction at the
+// appropriate speed for that alien type. Smaller aliens are more common at higher levels.
+func newSpawnedAlien(game *Game, position rl.Vector2) *Alien {
 	// Spawn a new alien
 	size := AlienBig
 	if game.Level > 2 && utils.RndInt32InRange(0, 10) < game.Level {
 		size = AlienSmall
 	}
-
-	position := game.World.RandomBorderPosition()
 	spawnedAlien := NewAlien(size, position)
 
 	// Point the alien towards a random position on the playfield
