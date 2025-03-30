@@ -214,6 +214,7 @@ func AlienRunner(ctx context.Context, alien *Alien) {
 			shootDirection = rl.Vector2Rotate(shootDirection, drift)
 			bullet := NewBullet(alien.Position, rl.Vector2Scale(shootDirection, bulletSpeed), false)
 			game.World.Objects.Add(&bullet)
+			game.EventBus.Publish("alien:fire")
 		}
 	}
 }

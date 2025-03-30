@@ -21,6 +21,7 @@ func NewAudioManager() *AudioManager {
 func (mgr *AudioManager) eventMappings() []eventMapping {
 	return []eventMapping{
 		{"alien:destroyed", mgr.alienDestroyedHandler},
+		{"alien:fire", mgr.alienFireHandler},
 		{"rock:destroyed", mgr.rockExplosionHandler},
 		{"spaceship:fire", mgr.spaceshipFireHandler},
 		{"spaceship:enter_hyperspace", mgr.spaceshipEnterHyperspaceHandler},
@@ -63,6 +64,10 @@ func (mgr *AudioManager) rockExplosionHandler(size core.RockSize) {
 
 func (mgr *AudioManager) alienDestroyedHandler(_ core.AlienSize) {
 	_ = mgr.playSound("explosion_alien.wav")
+}
+
+func (mgr *AudioManager) alienFireHandler() {
+	_ = mgr.playSound("fire_alien.wav")
 }
 
 func (mgr *AudioManager) spaceshipFireHandler() {
