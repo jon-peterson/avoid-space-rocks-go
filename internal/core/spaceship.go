@@ -5,6 +5,7 @@ import (
 	"avoid_the_space_rocks/internal/utils"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"math"
+	"time"
 )
 
 type Spaceship struct {
@@ -49,18 +50,26 @@ func (s *Spaceship) Update() error {
 	return nil
 }
 
-// Spawn the spaceship at the center of the playfield at the start of level
+// Spawn the spaceship at the center of the playfield at the start of level. This function may take a long
+// time to return because it waits until the spaceship can spawn at a safe place; call appropriately.
 func (s *Spaceship) Spawn() {
-	world := GetGame().World
+	game := GetGame()
 	s.Alive = true
 	s.Position = rl.Vector2{
-		X: world.Width / 2,
-		Y: world.Height / 2,
+		X: game.World.Width / 2,
+		Y: game.World.Height / 2,
 	}
 	s.Velocity = rl.Vector2{}
 	s.Acceleration = rl.Vector2{}
 	s.Rotation = rl.Vector2{X: 0, Y: -1}
-	world.Objects.Add(s)
+
+	// Wait until spawning won't make the ship explode immediately
+	dangerous := game.World.Objects.IsPositionOccupied(s.Position)
+	if dangerous {
+		time.Sleep(100 * time.Millisecond)
+		dangerous = game.World.Objects.IsPositionOccupied(s.Position)
+	}
+	game.World.Objects.Add(s)
 }
 
 // Draw the spaceship at its current position and rotation

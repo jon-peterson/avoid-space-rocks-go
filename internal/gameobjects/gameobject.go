@@ -117,6 +117,21 @@ func (c *GameObjectCollection) ForEach(action func(GameObject)) {
 	}
 }
 
+// IsPositionOccupied returns true if the given position is occupied by any collidable, live object in the playfield.
+func (c *GameObjectCollection) IsPositionOccupied(pos rl.Vector2) bool {
+	c.objectsLock.RLock()
+	defer c.objectsLock.RUnlock()
+
+	for idx, _ := range c.objects {
+		if collidable := c.getCollidable(idx); collidable != nil {
+			if rl.CheckCollisionPointRec(pos, collidable.GetHitbox()) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // removeDead removes all dead objects from the collection, after which the collection will be a full
 // slice of alive objects.
 func (c *GameObjectCollection) removeDead() {

@@ -26,7 +26,7 @@ func (w *World) Initialize() {
 	// Spaceship starts in the middle pointing up
 	w.Objects = gameobjects.NewGameObjectCollection()
 	w.Spaceship = NewSpaceship()
-	w.Spaceship.Spawn()
+	go w.Spaceship.Spawn()
 }
 
 // Wraparound returns the position of the given position, wrapping around the edges of the playfield
