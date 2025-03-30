@@ -142,7 +142,7 @@ func AlienSpawner(ctx context.Context) {
 	game := GetGame()
 	var alien *Alien = nil
 	var runnerCtx context.Context
-	spawnDelay := time.Second * max(1, time.Duration(10-game.Level))
+	spawnDelay := time.Second * max(1, time.Duration(10.0-(float32(game.Level)*1.25)))
 
 	ticker := time.NewTicker(spawnDelay)
 	defer ticker.Stop()
