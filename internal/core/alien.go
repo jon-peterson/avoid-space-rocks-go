@@ -209,12 +209,10 @@ func AlienRunner(ctx context.Context, alien *Alien) {
 				continue
 			}
 			// Fire a bullet roughly towards the spaceship
-			drift := rl.NewVector2(
-				utils.RndFloat32InRange(-alien.bulletDrift, alien.bulletDrift),
-				utils.RndFloat32InRange(-alien.bulletDrift, alien.bulletDrift))
-			target := rl.Vector2Add(game.World.Spaceship.Position, drift)
-			shootAt := rl.Vector2Normalize(rl.Vector2Subtract(target, alien.Position))
-			bullet := NewBullet(alien.Position, rl.Vector2Scale(shootAt, bulletSpeed), false)
+			drift := utils.RndFloat32InRange(-alien.bulletDrift, alien.bulletDrift)
+			shootDirection := rl.Vector2Normalize(rl.Vector2Subtract(game.World.Spaceship.Position, alien.Position))
+			shootDirection = rl.Vector2Rotate(shootDirection, drift)
+			bullet := NewBullet(alien.Position, rl.Vector2Scale(shootDirection, bulletSpeed), false)
 			game.World.Objects.Add(&bullet)
 		}
 	}

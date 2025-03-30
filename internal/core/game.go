@@ -30,7 +30,7 @@ const (
 	rockMaxRotate float32 = math.Pi * 6 // 3 rotations per second
 
 	alienMaxSpeed       float32 = 300.0
-	alienMaxBulletDrift float32 = math.Pi / 2
+	alienMaxBulletDrift float32 = math.Pi / 4
 	alienMinShootDelay          = 500
 )
 
