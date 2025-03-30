@@ -28,10 +28,11 @@ var alienSpriteFile = []struct {
 // Alien spaceships
 type Alien struct {
 	gameobjects.Rigidbody
-	spritesheet *gameobjects.SpriteSheet
-	isAlive     bool
-	size        AlienSize
-	bulletDrift float32
+	spritesheet  *gameobjects.SpriteSheet
+	isAlive      bool
+	size         AlienSize
+	bulletDrift  float32
+	runnerCancel context.CancelFunc
 }
 
 var _ gameobjects.Collidable = (*Alien)(nil)
@@ -114,6 +115,10 @@ func (a *Alien) OnDestruction(_ rl.Vector2) error {
 		shrapnel := NewShrapnel(a.Position, sheet, uint16(utils.RndInt32InRange(200, 400)), frame)
 		game.World.Objects.Add(&shrapnel)
 	}
+	// Cancel the runner goroutine if it exists
+	if a.runnerCancel != nil {
+		a.runnerCancel()
+	}
 	// Notify other services
 	game.EventBus.Publish("alien:destroyed", a.size)
 	return nil
@@ -137,7 +142,6 @@ func AlienSpawner(ctx context.Context) {
 	game := GetGame()
 	var alien *Alien = nil
 	var runnerCtx context.Context
-	var cancelRunner context.CancelFunc
 	spawnDelay := time.Second * max(1, time.Duration(10-game.Level))
 
 	ticker := time.NewTicker(spawnDelay)
@@ -147,8 +151,8 @@ func AlienSpawner(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			rl.TraceLog(rl.LogDebug, "AlienSpawner exiting")
-			if cancelRunner != nil {
-				cancelRunner()
+			if alien != nil && alien.runnerCancel != nil {
+				alien.runnerCancel()
 			}
 			return
 
@@ -158,13 +162,14 @@ func AlienSpawner(ctx context.Context) {
 				continue
 			}
 
+			// Handle case where there's already an alien on the playfield
 			if alien != nil {
 				if alien.IsAlive() {
 					// There's already an active alien in the level; let it run
 					continue
 				}
 				rl.TraceLog(rl.LogInfo, "Alien no longer on playfield; stopping")
-				cancelRunner()
+				alien.runnerCancel()
 				alien = nil
 				// Don't spawn another right away
 				continue
@@ -175,10 +180,9 @@ func AlienSpawner(ctx context.Context) {
 			if game.World.Objects.IsPositionOccupied(position) {
 				continue
 			}
-
 			rl.TraceLog(rl.LogInfo, "Spawning new alien")
 			alien = newSpawnedAlien(game, position)
-			runnerCtx, cancelRunner = context.WithCancel(context.Background())
+			runnerCtx, alien.runnerCancel = context.WithCancel(context.Background())
 			go AlienRunner(runnerCtx, alien)
 			game.World.Objects.Add(alien)
 		}
@@ -210,6 +214,10 @@ func AlienRunner(ctx context.Context, alien *Alien) {
 		case <-ticker.C:
 			if game.Paused {
 				continue
+			}
+			if !alien.IsAlive() {
+				// The alien associated with this runner is no longer alive; stop shooting permanently
+				return
 			}
 			if !game.World.Spaceship.IsAlive() {
 				continue
