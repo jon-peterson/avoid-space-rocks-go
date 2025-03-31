@@ -34,8 +34,7 @@ func NewSpaceship() Spaceship {
 }
 
 // Update the status of the spaceship
-func (s *Spaceship) Update() error {
-	delta := rl.GetFrameTime()
+func (s *Spaceship) Update(delta float32) error {
 	if s.FuelBurning {
 		s.Acceleration = rl.Vector2Scale(s.Rotation, shipFuelBoost*delta)
 	} else {
@@ -43,7 +42,7 @@ func (s *Spaceship) Update() error {
 		s.Acceleration = rl.Vector2{}
 		s.Velocity = rl.Vector2Scale(s.Velocity, 1-shipDecaySpeed*delta)
 	}
-	s.Rigidbody.ApplyPhysics()
+	s.Rigidbody.ApplyPhysics(delta)
 	// Position is updated after velocity is applied, so that the velocity is applied to the new position
 	game := GetGame()
 	s.Position = game.World.Wraparound(rl.Vector2Add(s.Position, s.Velocity))

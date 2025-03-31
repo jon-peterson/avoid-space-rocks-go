@@ -12,7 +12,7 @@ type MockGameObject struct {
 	hitbox rl.Rectangle
 }
 
-func (m *MockGameObject) Update() error {
+func (m *MockGameObject) Update(delta float32) error {
 	return nil
 }
 
@@ -46,8 +46,8 @@ func TestGameObjectCollectionUpdate(t *testing.T) {
 	collection.Add(&MockGameObject{alive: false})
 
 	// Update the collection twice (so it can remove the dead objects after adding)
-	collection.Update()
-	collection.Update()
+	collection.Update(0.1)
+	collection.Update(0.1)
 
 	// Verify that only alive objects remain
 	if len(collection.objects) != 2 {
@@ -68,7 +68,7 @@ func TestGameObjectCollectionCollisionCheck(t *testing.T) {
 	collection.Add(&MockGameObject{alive: true, hitbox: rl.NewRectangle(0, 0, 10, 10)})
 	collection.Add(&MockGameObject{alive: true, hitbox: rl.NewRectangle(5, 5, 10, 10)})
 	collection.Add(&MockGameObject{alive: true, hitbox: rl.NewRectangle(20, 20, 10, 10)})
-	collection.Update()
+	collection.Update(0.1)
 
 	// Verify that collisions are detected correctly
 	// In this case, the first two objects should collide
@@ -93,7 +93,7 @@ func TestGameObjectCollectionAny(t *testing.T) {
 	collection.Add(&MockGameObject{alive: false, name: "Robert Plant"})
 	collection.Add(&MockGameObject{alive: true, name: "Jimmy Page"})
 	collection.Add(&MockGameObject{alive: false, name: "John Paul Jones"})
-	collection.Update()
+	collection.Update(0.1)
 
 	// Test case: Check if any object is alive
 	if !collection.Any(func(obj GameObject) bool {
@@ -132,7 +132,7 @@ func TestGameObjectCollectionForEach(t *testing.T) {
 	collection.Add(&MockGameObject{alive: false})
 	collection.Add(&MockGameObject{alive: true})
 	collection.Add(&MockGameObject{alive: false})
-	collection.Update()
+	collection.Update(0.1)
 
 	collection.ForEach(func(obj GameObject) {
 		if mockObj, ok := obj.(*MockGameObject); ok {
@@ -156,7 +156,7 @@ func TestGameObjectCollectionHasRemainingEnemies(t *testing.T) {
 	collection.Add(&MockGameObject{alive: false, enemy: true})
 	collection.Add(&MockGameObject{alive: true, enemy: false})
 	collection.Add(&MockGameObject{alive: false, enemy: false})
-	collection.Update()
+	collection.Update(0.1)
 
 	// Test case: Check if there are any remaining enemies
 	if !collection.HasRemainingEnemies() {
@@ -169,7 +169,7 @@ func TestGameObjectCollectionHasRemainingEnemies(t *testing.T) {
 			mockObj.alive = false
 		}
 	})
-	collection.Update()
+	collection.Update(0.1)
 	if collection.HasRemainingEnemies() {
 		t.Errorf("Did not expect to find remaining enemies after marking all dead")
 	}

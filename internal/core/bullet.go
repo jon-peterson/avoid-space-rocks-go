@@ -35,11 +35,11 @@ func NewBullet(position, velocity rl.Vector2, isPlayerFired bool) Bullet {
 }
 
 // Update applies physics to the bullet so it moves per its velocity.
-func (b *Bullet) Update() error {
+func (b *Bullet) Update(delta float32) error {
 	game := GetGame()
-	b.Rigidbody.ApplyPhysics()
+	b.Rigidbody.ApplyPhysics(delta)
 	b.Position = game.World.Wraparound(b.Position)
-	b.ageMs += uint16(rl.GetFrameTime() * 1000)
+	b.ageMs += uint16(delta * 1000)
 	return nil
 }
 

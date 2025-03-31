@@ -57,9 +57,9 @@ func NewAlien(size AlienSize, position rl.Vector2) Alien {
 }
 
 // Update applies physics to the alien so it moves along its current direction
-func (a *Alien) Update() error {
+func (a *Alien) Update(delta float32) error {
 	game := GetGame()
-	a.Rigidbody.ApplyPhysics()
+	a.Rigidbody.ApplyPhysics(delta)
 	if game.World.IsOutsideEdges(a.Position) {
 		// If the alien goes outside the edges, we remove it from the game sometimes
 		if utils.Chance(0.2) {

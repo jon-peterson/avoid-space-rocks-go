@@ -103,7 +103,7 @@ func TestRock_OnDestruction(t *testing.T) {
 	}
 
 	// After a tick there should be some small rocks
-	game.World.Objects.Update()
+	game.World.Objects.Update(0.1)
 	if !game.World.Objects.Any(
 		func(obj gameobjects.GameObject) bool {
 			rock, ok := obj.(*Rock)

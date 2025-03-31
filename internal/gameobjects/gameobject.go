@@ -6,7 +6,7 @@ import (
 )
 
 type GameObject interface {
-	Update() error
+	Update(delta float32) error
 	Draw() error
 	IsAlive() bool
 	IsEnemy() bool
@@ -44,7 +44,7 @@ func (c *GameObjectCollection) Add(obj GameObject) {
 
 // Update all the objects in the collection. Removes dead objects, updates the rest.
 // Checks for collisions between objects.
-func (c *GameObjectCollection) Update() {
+func (c *GameObjectCollection) Update(delta float32) {
 	// Remove all dead objects from the collection
 	c.removeDead()
 	c.birthNew()
@@ -53,7 +53,7 @@ func (c *GameObjectCollection) Update() {
 	c.objectsLock.RLock()
 	defer c.objectsLock.RUnlock()
 	for idx, obj := range c.objects {
-		if err := obj.Update(); err != nil {
+		if err := obj.Update(delta); err != nil {
 			rl.TraceLog(rl.LogError, "error updating object %d %v: %v", idx, obj, err)
 		}
 	}

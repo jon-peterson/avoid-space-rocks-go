@@ -47,13 +47,12 @@ func NewShrapnel(position rl.Vector2, sheet *gameobjects.SpriteSheet, lifespan u
 }
 
 // Update applies physics to the bullet so it moves per its velocity.
-func (s *Shrapnel) Update() error {
+func (s *Shrapnel) Update(delta float32) error {
 	game := GetGame()
-	delta := rl.GetFrameTime()
 	s.Rotation = rl.Vector2Rotate(s.Rotation, s.rotationSpeed*delta)
-	s.Rigidbody.ApplyPhysics()
+	s.Rigidbody.ApplyPhysics(delta)
 	s.Position = game.World.Wraparound(s.Position)
-	s.ageMs += uint16(rl.GetFrameTime() * 1000)
+	s.ageMs += uint16(delta * 1000)
 	return nil
 }
 

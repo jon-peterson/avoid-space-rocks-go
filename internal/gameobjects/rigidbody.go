@@ -17,8 +17,7 @@ func (rb *Rigidbody) String() string {
 }
 
 // ApplyPhysics applies acceleration to the velocity and then moves the object
-func (rb *Rigidbody) ApplyPhysics() {
-	delta := rl.GetFrameTime()
+func (rb *Rigidbody) ApplyPhysics(delta float32) {
 	rb.Velocity = rl.Vector2Add(rb.Velocity, rb.Acceleration)
 	if rb.MaxVelocity > 0 {
 		// TODO: fix this; it's not applying max velocity correctly

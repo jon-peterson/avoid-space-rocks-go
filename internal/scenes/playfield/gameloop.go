@@ -114,7 +114,8 @@ func update() {
 	if game.Paused {
 		return
 	}
-	game.World.Objects.Update()
+	delta := rl.GetFrameTime()
+	game.World.Objects.Update(delta)
 	for _, obs := range game.Observers {
 		_ = obs.Update(game)
 	}

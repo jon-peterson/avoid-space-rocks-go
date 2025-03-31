@@ -64,11 +64,10 @@ func NewRock(size RockSize, position rl.Vector2) Rock {
 }
 
 // Update applies physics to the rock so it moves per its velocity and rotation speed.
-func (r *Rock) Update() error {
+func (r *Rock) Update(delta float32) error {
 	game := GetGame()
-	delta := rl.GetFrameTime()
 	r.Rotation = rl.Vector2Rotate(r.Rotation, r.rotationSpeed*delta)
-	r.Rigidbody.ApplyPhysics()
+	r.Rigidbody.ApplyPhysics(delta)
 	r.Position = game.World.Wraparound(r.Position)
 	return nil
 }
