@@ -61,9 +61,14 @@ func (a *Alien) Update() error {
 	game := GetGame()
 	a.Rigidbody.ApplyPhysics()
 	if game.World.IsOutsideEdges(a.Position) {
-		// If the alien goes outside the edges, we just remove it from the game
-		a.isAlive = false
-		game.EventBus.Publish("alien:left_playfield", a.size)
+		// If the alien goes outside the edges, we remove it from the game sometimes
+		if utils.Chance(0.2) {
+			a.isAlive = false
+			game.EventBus.Publish("alien:left_playfield", a.size)
+		} else {
+			// Wrap around the edges of the playfield
+			a.Position = game.World.Wraparound(a.Position)
+		}
 	}
 	return nil
 }
