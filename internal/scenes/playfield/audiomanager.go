@@ -31,6 +31,8 @@ func (mgr *AudioManager) eventMappings() []eventMapping {
 	return []eventMapping{
 		{"alien:destroyed", mgr.alienDestroyedHandler},
 		{"alien:fire", mgr.alienFireHandler},
+		{"alien:left_playfield", mgr.alienLeftPlayfieldHandler},
+		{"alien:spawned", mgr.alienSpawnedHandler},
 		{"rock:destroyed", mgr.rockExplosionHandler},
 		{"spaceship:fire", mgr.spaceshipFireHandler},
 		{"spaceship:thrust", mgr.spaceshipThrustHandler},
@@ -90,8 +92,30 @@ func (mgr *AudioManager) rockExplosionHandler(size core.RockSize) {
 	}
 }
 
-func (mgr *AudioManager) alienDestroyedHandler(_ core.AlienSize) {
+func (mgr *AudioManager) alienSpawnedHandler(size core.AlienSize) {
+	if size == core.AlienBig {
+		_ = mgr.startMusic("move_alien_big.wav")
+	} else {
+		_ = mgr.startMusic("move_alien_small.wav")
+	}
 	_ = mgr.playSound("explosion_alien.wav")
+}
+
+func (mgr *AudioManager) alienDestroyedHandler(size core.AlienSize) {
+	if size == core.AlienBig {
+		_ = mgr.stopMusic("move_alien_big.wav")
+	} else {
+		_ = mgr.stopMusic("move_alien_small.wav")
+	}
+	_ = mgr.playSound("explosion_alien.wav")
+}
+
+func (mgr *AudioManager) alienLeftPlayfieldHandler(size core.AlienSize) {
+	if size == core.AlienBig {
+		_ = mgr.stopMusic("move_alien_big.wav")
+	} else {
+		_ = mgr.stopMusic("move_alien_small.wav")
+	}
 }
 
 func (mgr *AudioManager) alienFireHandler() {
@@ -104,22 +128,22 @@ func (mgr *AudioManager) spaceshipFireHandler() {
 
 func (mgr *AudioManager) spaceshipThrustHandler(start bool) {
 	if start {
-		mgr.startMusic("fuel_burn.wav")
+		_ = mgr.startMusic("fuel_burn.wav")
 	} else {
-		mgr.stopMusic("fuel_burn.wav")
+		_ = mgr.stopMusic("fuel_burn.wav")
 	}
 }
 
 func (mgr *AudioManager) spaceshipExplosionHandler() {
 	if mgr.playingMusic.Contains("fuel_burn.wav") {
-		mgr.stopMusic("fuel_burn.wav")
+		_ = mgr.stopMusic("fuel_burn.wav")
 	}
 	_ = mgr.playSound("explosion_ship.wav")
 }
 
 func (mgr *AudioManager) spaceshipEnterHyperspaceHandler() {
 	if mgr.playingMusic.Contains("fuel_burn.wav") {
-		mgr.stopMusic("fuel_burn.wav")
+		_ = mgr.stopMusic("fuel_burn.wav")
 	}
 	_ = mgr.playSound("hyperspace.wav")
 }
@@ -134,34 +158,40 @@ func (mgr *AudioManager) playSound(filename string) error {
 }
 
 // startMusic starts playing a music file from a filename, or returns an error if it can't.
-func (mgr *AudioManager) startMusic(filename string) {
+func (mgr *AudioManager) startMusic(filename string) error {
 	if !mgr.playingMusic.Contains(filename) {
 		rl.TraceLog(rl.LogDebug, "Starting music for %s", filename)
-		mgr.withMusic(filename, func(music *rl.Music) {
+		return mgr.withMusic(filename, func(music *rl.Music) error {
 			mgr.playingMusic.Insert(filename)
 			rl.PlayMusicStream(*music)
+			return nil
 		})
 	}
+	return nil
 }
 
 // stopMusic stops playing a music file from a filename, or returns an error if it can't.
-func (mgr *AudioManager) stopMusic(filename string) {
+func (mgr *AudioManager) stopMusic(filename string) error {
 	if mgr.playingMusic.Contains(filename) {
 		rl.TraceLog(rl.LogDebug, "Stopping music for %s", filename)
-		mgr.withMusic(filename, func(music *rl.Music) {
+		return mgr.withMusic(filename, func(music *rl.Music) error {
 			mgr.playingMusic.Remove(filename)
 			rl.StopMusicStream(*music)
+			return nil
 		})
 	}
+	return nil
 }
 
-type musicHandler func(*rl.Music)
+type musicHandler func(*rl.Music) error
 
-func (mgr *AudioManager) withMusic(filename string, callback musicHandler) {
+// withMusic loads a music file from a filename and calls the callback with it.
+func (mgr *AudioManager) withMusic(filename string, callback musicHandler) error {
 	music, err := mgr.musicFromFile(filename)
 	if err == nil {
-		callback(music)
+		return callback(music)
 	}
+	return err
 }
 
 // soundFromFile loads a sound from a file, or returns an error if it can't.
@@ -178,7 +208,7 @@ func (mgr *AudioManager) soundFromFile(filename string) (*rl.Sound, error) {
 	mgr.soundLock.Lock()
 	defer mgr.soundLock.Unlock()
 	sound := rl.LoadSound(fmt.Sprintf("assets/audio/%s", filename))
-	if sound.Stream.Buffer == nil {
+	if sound.Stream.Buffer == nil || !rl.IsSoundValid(sound) {
 		return &sound, fmt.Errorf("could not load sound file %s", filename)
 	}
 	mgr.soundMap[filename] = &sound
@@ -199,7 +229,7 @@ func (mgr *AudioManager) musicFromFile(filename string) (*rl.Music, error) {
 	mgr.musicLock.Lock()
 	defer mgr.musicLock.Unlock()
 	music := rl.LoadMusicStream(fmt.Sprintf("assets/audio/%s", filename))
-	if music.Stream.Buffer == nil {
+	if music.Stream.Buffer == nil || !rl.IsMusicValid(music) {
 		return &music, fmt.Errorf("could not load music file %s", filename)
 	}
 	music.Looping = true

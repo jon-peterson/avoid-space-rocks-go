@@ -185,6 +185,7 @@ func AlienSpawner(ctx context.Context) {
 			runnerCtx, alien.runnerCancel = context.WithCancel(context.Background())
 			go AlienRunner(runnerCtx, alien)
 			game.World.Objects.Add(alien)
+			game.EventBus.Publish("alien:spawned", alien.size)
 		}
 	}
 }
