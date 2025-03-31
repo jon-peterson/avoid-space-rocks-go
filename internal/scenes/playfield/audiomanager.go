@@ -34,6 +34,7 @@ func (mgr *AudioManager) eventMappings() []eventMapping {
 		{"alien:left_playfield", mgr.alienLeftPlayfieldHandler},
 		{"alien:spawned", mgr.alienSpawnedHandler},
 		{"rock:destroyed", mgr.rockExplosionHandler},
+		{"spaceship:extra_life", mgr.spaceshipExtraLifeHandler},
 		{"spaceship:fire", mgr.spaceshipFireHandler},
 		{"spaceship:thrust", mgr.spaceshipThrustHandler},
 		{"spaceship:enter_hyperspace", mgr.spaceshipEnterHyperspaceHandler},
@@ -67,7 +68,7 @@ func (mgr *AudioManager) Deregister(game *core.Game) error {
 
 // Update is called every frame to update the audio manager. If there are any playing music
 // streams, it updates them so they continue to play.
-func (mgr *AudioManager) Update(game *core.Game) error {
+func (mgr *AudioManager) Update(_ *core.Game) error {
 	if !mgr.playingMusic.Empty() {
 		mgr.musicLock.RLock()
 		defer mgr.musicLock.RUnlock()
@@ -120,6 +121,10 @@ func (mgr *AudioManager) alienLeftPlayfieldHandler(size core.AlienSize) {
 
 func (mgr *AudioManager) alienFireHandler() {
 	_ = mgr.playSound("fire_alien.wav")
+}
+
+func (mgr *AudioManager) spaceshipExtraLifeHandler() {
+	_ = mgr.playSound("extra_life.wav")
 }
 
 func (mgr *AudioManager) spaceshipFireHandler() {

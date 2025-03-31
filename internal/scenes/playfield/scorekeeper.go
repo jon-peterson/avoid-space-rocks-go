@@ -3,9 +3,16 @@ package playfield
 import (
 	"avoid_the_space_rocks/internal/core"
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"math"
+)
+
+// Constants for score stuff
+const (
+	shipExtraLife = 10_000
 )
 
 type ScoreKeeper struct {
+	game *core.Game
 }
 
 var _ core.EventObserver = (*ScoreKeeper)(nil)
@@ -21,6 +28,7 @@ func NewScoreKeeper() *ScoreKeeper {
 }
 
 func (sk *ScoreKeeper) Register(game *core.Game) error {
+	sk.game = game
 	for _, sub := range sk.eventMappings() {
 		if err := game.EventBus.SubscribeAsync(sub.event, sub.handler, false); err != nil {
 			rl.TraceLog(rl.LogError, "error subscribing to %s event: %v", sub.event, err)
@@ -40,28 +48,38 @@ func (sk *ScoreKeeper) Deregister(game *core.Game) error {
 	return nil
 }
 
-func (sk *ScoreKeeper) Update(game *core.Game) error {
+func (sk *ScoreKeeper) Update(_ *core.Game) error {
 	return nil
 }
 
 func (sk *ScoreKeeper) rockScoreHandler(size core.RockSize) {
 	switch size {
 	case core.RockTiny:
-		core.GetGame().Score += 100
+		sk.addPoints(100)
 	case core.RockSmall:
-		core.GetGame().Score += 75
+		sk.addPoints(75)
 	case core.RockMedium:
-		core.GetGame().Score += 50
+		sk.addPoints(50)
 	case core.RockBig:
-		core.GetGame().Score += 20
+		sk.addPoints(25)
 	}
 }
 
 func (sk *ScoreKeeper) alienScoreHandler(size core.AlienSize) {
 	switch size {
 	case core.AlienSmall:
-		core.GetGame().Score += 500
+		sk.addPoints(250)
 	case core.AlienBig:
-		core.GetGame().Score += 1000
+		sk.addPoints(500)
+	}
+}
+
+func (sk *ScoreKeeper) addPoints(points int) {
+	rewardLevel := uint64(math.Floor(float64(uint64(core.GetGame().Score/shipExtraLife))) + 1)
+	pointsForNewLife := rewardLevel * shipExtraLife
+	core.GetGame().Score += uint64(points)
+	if core.GetGame().Score >= pointsForNewLife && sk.game.Lives < 20 {
+		sk.game.Lives += 1
+		sk.game.EventBus.Publish("spaceship:extra_life")
 	}
 }
