@@ -28,6 +28,7 @@ const (
 
 	rockMaxSpeed  float32 = 200.0
 	rockMaxRotate float32 = math.Pi * 6 // 3 rotations per second
+	rockMaxCount          = 30
 
 	alienMaxSpeed       float32 = 300.0
 	alienMaxBulletDrift float32 = math.Pi / 4
@@ -39,6 +40,7 @@ type Game struct {
 
 	Lives int32
 	Level int32
+	Rocks int32
 	Score uint64
 
 	Paused    bool
@@ -84,6 +86,7 @@ func InitGame(screenWidth, screenHeight float32) *Game {
 // engine and everything keeps running.
 func (g *Game) StartLevel() {
 	g.Level += 1
+	g.Rocks = 0
 
 	// Display the level number for a few seconds
 	rl.TraceLog(rl.LogInfo, fmt.Sprintf("Starting level %d", g.Level))
@@ -100,9 +103,10 @@ func (g *Game) StartLevel() {
 	go AlienSpawner(ctx)
 
 	// Spawn the appropriate number of rocks
-	for range min(g.Level+3, 25) {
+	for range min(g.Level+3, rockMaxCount) {
 		rock := NewRock(RockBig, g.World.RandomBorderPosition())
 		g.World.Objects.Add(&rock)
+		g.EventBus.Publish("rock:spawned", RockBig)
 	}
 }
 

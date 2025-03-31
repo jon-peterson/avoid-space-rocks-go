@@ -110,13 +110,19 @@ func (r *Rock) OnDestruction(bulletVelocity rl.Vector2) error {
 	r.isAlive = false
 	// Spawn smaller rocks at same location as appropriate for level
 	if int32(r.size) > max(0, 4-game.Level) {
-		for range utils.RndInt32InRange(2, max(3, int32(game.Level/2))) {
+		// Span more rocks at higher levels, but if we've hit our cap, replace one for one
+		toSpawn := utils.RndInt32InRange(2, max(3, int32(game.Level/2)))
+		if game.Rocks >= rockMaxCount {
+			toSpawn = 1
+		}
+		for range toSpawn {
 			// Spawn a new rock at the same position as the old one but a bit away from dir of the bullet
 			newRock := NewRock(r.size-1, r.Position)
 			spriteWidth := newRock.spritesheet.GetRectangle(newRock.Position).Width / 2
 			scaledBulletVelocity := rl.Vector2Scale(rl.Vector2Normalize(bulletVelocity), spriteWidth)
 			newRock.Position = rl.Vector2Add(newRock.Position, scaledBulletVelocity)
 			game.World.Objects.Add(&newRock)
+			game.EventBus.Publish("rock:spawned", r.size)
 			// Add a bit of bullet velocity to each new rock so more likely moving away
 			newRock.Velocity = rl.Vector2Add(newRock.Velocity, rl.Vector2Scale(bulletVelocity, 0.1))
 		}

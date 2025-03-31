@@ -14,6 +14,7 @@ var _ core.EventObserver = (*GameWarden)(nil)
 
 func (gw *GameWarden) eventMappings() []eventMapping {
 	return []eventMapping{
+		{"rock:spawned", gw.rockSpawnedWatcher},
 		{"rock:destroyed", gw.rockDestroyedWatcher},
 		{"alien:destroyed", gw.alienRemovedWatcher},
 		{"alien:left_playfield", gw.alienRemovedWatcher},
@@ -47,12 +48,18 @@ func (gw *GameWarden) Deregister(game *core.Game) error {
 	return nil
 }
 
-func (gw *GameWarden) Update(game *core.Game) error {
+func (gw *GameWarden) Update(_ *core.Game) error {
 	return nil
+}
+
+// rockSpawnedWatcher is called when a new rock is added to the level.
+func (gw *GameWarden) rockSpawnedWatcher(_ core.RockSize) {
+	gw.game.Rocks += 1
 }
 
 // rockDestroyedWatcher is called when a rock is destroyed. Calls the end-of-level check.
 func (gw *GameWarden) rockDestroyedWatcher(_ core.RockSize) {
+	gw.game.Rocks -= 1
 	gw.checkEndOfLevel()
 }
 
