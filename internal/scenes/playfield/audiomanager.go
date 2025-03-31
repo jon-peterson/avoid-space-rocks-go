@@ -162,7 +162,9 @@ func (mgr *AudioManager) startMusic(filename string) error {
 	if !mgr.playingMusic.Contains(filename) {
 		rl.TraceLog(rl.LogDebug, "Starting music for %s", filename)
 		return mgr.withMusic(filename, func(music *rl.Music) error {
+			mgr.musicLock.Lock()
 			mgr.playingMusic.Insert(filename)
+			mgr.musicLock.Unlock()
 			rl.PlayMusicStream(*music)
 			return nil
 		})
@@ -175,7 +177,9 @@ func (mgr *AudioManager) stopMusic(filename string) error {
 	if mgr.playingMusic.Contains(filename) {
 		rl.TraceLog(rl.LogDebug, "Stopping music for %s", filename)
 		return mgr.withMusic(filename, func(music *rl.Music) error {
+			mgr.musicLock.Lock()
 			mgr.playingMusic.Remove(filename)
+			mgr.musicLock.Unlock()
 			rl.StopMusicStream(*music)
 			return nil
 		})
