@@ -16,9 +16,9 @@ var instance *Game
 // Constants for gameplay feel
 const (
 	shipRotateSpeed float32 = math.Pi * 3 // 1.5 rotations per second
-	shipMaxSpeed    float32 = 15.0
-	shipDecaySpeed  float32 = 2.0
-	shipFuelBoost   float32 = 40.0
+	shipMaxSpeed    float32 = 400.0
+	shipDecaySpeed  float32 = 1.0
+	shipFuelBoost   float32 = 50.0
 
 	bulletSpeed      float32 = 500.0
 	bulletLifetimeMs uint16  = 1250
