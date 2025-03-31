@@ -12,7 +12,7 @@ type MockGameObject struct {
 	hitbox rl.Rectangle
 }
 
-func (m *MockGameObject) Update(delta float32) error {
+func (m *MockGameObject) Update(_ float32) error {
 	return nil
 }
 
@@ -184,5 +184,83 @@ func TestGameObjectCollectionHasRemainingEnemies(t *testing.T) {
 	collection.Add(&MockGameObject{alive: true, enemy: true})
 	if !collection.HasRemainingEnemies() {
 		t.Errorf("Newly added enemy should leave collection with remaining enemies")
+	}
+}
+
+func TestGameObjectCollectionIsPositionOccupied(t *testing.T) {
+	tests := []struct {
+		name     string
+		objects  []GameObject
+		testArea rl.Rectangle
+		want     bool
+	}{
+		{
+			name:     "empty area with no objects",
+			objects:  []GameObject{},
+			testArea: rl.NewRectangle(0, 0, 10, 10),
+			want:     false,
+		},
+		{
+			name: "area overlaps with object",
+			objects: []GameObject{
+				&MockGameObject{
+					alive:  true,
+					hitbox: rl.NewRectangle(5, 5, 10, 10),
+				},
+			},
+			testArea: rl.NewRectangle(0, 0, 10, 10),
+			want:     true,
+		},
+		{
+			name: "area does not overlap with object",
+			objects: []GameObject{
+				&MockGameObject{
+					alive:  true,
+					hitbox: rl.NewRectangle(20, 20, 10, 10),
+				},
+			},
+			testArea: rl.NewRectangle(0, 0, 10, 10),
+			want:     false,
+		},
+		{
+			name: "area overlaps with dead object",
+			objects: []GameObject{
+				&MockGameObject{
+					alive:  false,
+					hitbox: rl.NewRectangle(5, 5, 10, 10),
+				},
+			},
+			testArea: rl.NewRectangle(0, 0, 10, 10),
+			want:     false,
+		},
+		{
+			name: "area overlaps with one of multiple objects",
+			objects: []GameObject{
+				&MockGameObject{
+					alive:  true,
+					hitbox: rl.NewRectangle(20, 20, 10, 10),
+				},
+				&MockGameObject{
+					alive:  true,
+					hitbox: rl.NewRectangle(5, 5, 10, 10),
+				},
+			},
+			testArea: rl.NewRectangle(0, 0, 10, 10),
+			want:     true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			collection := NewGameObjectCollection()
+			for _, obj := range tt.objects {
+				collection.Add(obj)
+			}
+			collection.Update(0.1) // Process newly added objects
+
+			if got := collection.IsRectangleOccupied(tt.testArea); got != tt.want {
+				t.Errorf("IsRectangleOccupied() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }

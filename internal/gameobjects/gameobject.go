@@ -117,14 +117,14 @@ func (c *GameObjectCollection) ForEach(action func(GameObject)) {
 	}
 }
 
-// IsPositionOccupied returns true if the given position is occupied by any collidable, live object in the playfield.
-func (c *GameObjectCollection) IsPositionOccupied(pos rl.Vector2) bool {
+// IsRectangleOccupied returns true if the given rectangle overlaps with any collidable, live object in the playfield.
+func (c *GameObjectCollection) IsRectangleOccupied(area rl.Rectangle) bool {
 	c.objectsLock.RLock()
 	defer c.objectsLock.RUnlock()
 
-	for idx, _ := range c.objects {
+	for idx := range c.objects {
 		if collidable := c.getCollidable(idx); collidable != nil {
-			if rl.CheckCollisionPointRec(pos, collidable.GetHitbox()) {
+			if rl.CheckCollisionRecs(area, collidable.GetHitbox()) {
 				return true
 			}
 		}
@@ -192,5 +192,18 @@ func (c *GameObjectCollection) getCollidable(idx int) Collidable {
 		return cast
 	} else {
 		return nil
+	}
+}
+
+// ExtendRectangle increases the size of a rectangle by a percentage, keeping the center point the same.
+func ExtendRectangle(rect rl.Rectangle, percentage float32) rl.Rectangle {
+	widthIncrease := rect.Width * percentage
+	heightIncrease := rect.Height * percentage
+
+	return rl.Rectangle{
+		X:      rect.X - (widthIncrease / 2),
+		Y:      rect.Y - (heightIncrease / 2),
+		Width:  rect.Width + widthIncrease,
+		Height: rect.Height + heightIncrease,
 	}
 }

@@ -182,11 +182,11 @@ func AlienSpawner(ctx context.Context) {
 
 			// Try to spawn a new alien, but if the position is occupied just skip this time around
 			position := game.World.RandomBorderPosition()
-			if game.World.Objects.IsPositionOccupied(position) {
+			alien = newSpawnedAlien(game, position)
+			if game.World.Objects.IsRectangleOccupied(gameobjects.ExtendRectangle(alien.GetHitbox(), 0.25)) {
 				continue
 			}
 			rl.TraceLog(rl.LogInfo, "Spawning new alien")
-			alien = newSpawnedAlien(game, position)
 			runnerCtx, alien.runnerCancel = context.WithCancel(context.Background())
 			go AlienRunner(runnerCtx, alien)
 			game.World.Objects.Add(alien)

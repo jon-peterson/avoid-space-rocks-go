@@ -62,10 +62,11 @@ func (s *Spaceship) Spawn() {
 	s.Rotation = rl.Vector2{X: 0, Y: -1}
 
 	// Wait until spawning won't make the ship explode immediately
-	dangerous := game.World.Objects.IsPositionOccupied(s.Position)
+	extendedLocation := gameobjects.ExtendRectangle(s.GetHitbox(), 0.5)
+	dangerous := game.World.Objects.IsRectangleOccupied(extendedLocation)
 	if dangerous {
 		time.Sleep(100 * time.Millisecond)
-		dangerous = game.World.Objects.IsPositionOccupied(s.Position)
+		dangerous = game.World.Objects.IsRectangleOccupied(extendedLocation)
 	}
 	game.World.Objects.Add(s)
 }
