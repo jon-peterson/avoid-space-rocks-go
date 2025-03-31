@@ -39,7 +39,7 @@ func (am *GameOverMode) Loop() scenes.SceneCode {
 
 		score := humanize.Comma(int64(core.GetGame().Score))
 		utils.CenterText("Your Score", rl.Vector2{X: am.width / 2, Y: am.height / 2}, 30)
-		utils.CenterText(score, rl.Vector2{X: am.width / 2, Y: am.height/2 + 35}, 50)
+		utils.CenterText(score, rl.Vector2{X: am.width / 2, Y: am.height/2 + 75}, 60)
 
 		rl.EndDrawing()
 	}
