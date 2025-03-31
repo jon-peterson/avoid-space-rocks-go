@@ -10,6 +10,8 @@ type GameWarden struct {
 	game *core.Game
 }
 
+var _ core.EventObserver = (*GameWarden)(nil)
+
 func (gw *GameWarden) eventMappings() []eventMapping {
 	return []eventMapping{
 		{"rock:destroyed", gw.rockDestroyedWatcher},
@@ -42,6 +44,10 @@ func (gw *GameWarden) Deregister(game *core.Game) error {
 			return err
 		}
 	}
+	return nil
+}
+
+func (gw *GameWarden) Update(game *core.Game) error {
 	return nil
 }
 

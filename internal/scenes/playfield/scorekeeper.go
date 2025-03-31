@@ -8,6 +8,8 @@ import (
 type ScoreKeeper struct {
 }
 
+var _ core.EventObserver = (*ScoreKeeper)(nil)
+
 func (sk *ScoreKeeper) eventMappings() []eventMapping {
 	return []eventMapping{
 		{"rock:destroyed", sk.rockScoreHandler},
@@ -35,6 +37,10 @@ func (sk *ScoreKeeper) Deregister(game *core.Game) error {
 			return err
 		}
 	}
+	return nil
+}
+
+func (sk *ScoreKeeper) Update(game *core.Game) error {
 	return nil
 }
 

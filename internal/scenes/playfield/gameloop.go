@@ -69,8 +69,17 @@ func handleInput() {
 		if rl.IsKeyDown(rl.KeyRight) {
 			spaceship.RotateRight()
 		}
-		spaceship.FuelBurning = rl.IsKeyDown(rl.KeyUp)
-
+		if rl.IsKeyDown(rl.KeyUp) {
+			if !spaceship.FuelBurning {
+				spaceship.FuelBurning = true
+				game.EventBus.Publish("spaceship:thrust", true)
+			}
+		} else {
+			if spaceship.FuelBurning {
+				spaceship.FuelBurning = false
+				game.EventBus.Publish("spaceship:thrust", false)
+			}
+		}
 		pressedKey := rl.GetKeyPressed()
 		if pressedKey == rl.KeySpace {
 			spaceship.Fire()
@@ -106,6 +115,9 @@ func update() {
 		return
 	}
 	game.World.Objects.Update()
+	for _, obs := range game.Observers {
+		_ = obs.Update(game)
+	}
 }
 
 // Draw all game state

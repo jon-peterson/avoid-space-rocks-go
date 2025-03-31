@@ -49,3 +49,29 @@ func TestSoundFromFile_NotExist(t *testing.T) {
 		t.Fatalf("expected an error, got nil")
 	}
 }
+
+func TestMusicFromFile(t *testing.T) {
+	audioManager := NewAudioManager()
+
+	// Test loading a music file
+	filename := "fuel_burn.wav"
+	music, err := audioManager.musicFromFile(filename)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if music.Stream.Buffer == nil {
+		t.Fatalf("expected valid music, got nil buffer")
+	}
+
+	// Test loading the same music file from cache
+	cachedMusic, err := audioManager.musicFromFile(filename)
+	if err != nil {
+		t.Fatalf("expected no error loading cache, got %v", err)
+	}
+	if cachedMusic.Stream.Buffer == nil {
+		t.Fatalf("expected valid music loading cache, got nil buffer")
+	}
+	if music != cachedMusic {
+		t.Fatalf("expected cached music, got different instance")
+	}
+}

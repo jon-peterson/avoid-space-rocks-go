@@ -56,6 +56,7 @@ type Game struct {
 type EventObserver interface {
 	Register(game *Game) error
 	Deregister(game *Game) error
+	Update(game *Game) error
 }
 
 func GetGame() *Game {
@@ -99,7 +100,7 @@ func (g *Game) StartLevel() {
 	go AlienSpawner(ctx)
 
 	// Spawn the appropriate number of rocks
-	for range g.Level + 3 {
+	for range min(g.Level+3, 25) {
 		rock := NewRock(RockBig, g.World.RandomBorderPosition())
 		g.World.Objects.Add(&rock)
 	}
