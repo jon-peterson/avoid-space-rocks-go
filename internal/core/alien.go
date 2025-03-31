@@ -140,6 +140,20 @@ func (a *Alien) frameIndex() int {
 	return halfSeconds % frameCount
 }
 
+// randomizeAlienTarget sets the alien's target to a random position on the playfield, at a random speed.
+func (a *Alien) randomizeAlienTarget() {
+	game := GetGame()
+	target := game.World.RandomPosition()
+	a.Velocity = rl.Vector2Normalize(rl.Vector2Subtract(target, a.Position))
+	if a.size == AlienBig {
+		sp := utils.RndFloat32InRange(alienMaxSpeed/2, alienMaxSpeed) / 2
+		a.Velocity = rl.Vector2Scale(a.Velocity, sp)
+	} else {
+		sp := utils.RndFloat32InRange(alienMaxSpeed/2, alienMaxSpeed)
+		a.Velocity = rl.Vector2Scale(a.Velocity, sp)
+	}
+}
+
 // AlienSpawner adds new aliens to the playfield at an appropriate rate
 func AlienSpawner(ctx context.Context) {
 	rl.TraceLog(rl.LogDebug, "AlienSpawner starting")
@@ -199,16 +213,16 @@ func AlienRunner(ctx context.Context, alien *Alien) {
 	rl.TraceLog(rl.LogDebug, "AlienRunner starting")
 	game := GetGame()
 
-	// Small aliens shoot more frequently, and more as the level increases
-	shootDelay := 4000 - int32(300*game.Level)
+	// Small aliens do things more frequently
+	actionDelay := 3000 - int32(300*game.Level)
 	if alien.size == AlienSmall {
-		shootDelay /= 2
+		actionDelay /= 2
 	}
-	if shootDelay < alienMinShootDelay {
-		shootDelay = alienMinShootDelay
+	if actionDelay < alienMinActionDelay {
+		actionDelay = alienMinActionDelay
 	}
 
-	ticker := time.NewTicker(time.Millisecond * time.Duration(shootDelay))
+	ticker := time.NewTicker(time.Millisecond * time.Duration(actionDelay))
 	defer ticker.Stop()
 
 	for {
@@ -228,13 +242,21 @@ func AlienRunner(ctx context.Context, alien *Alien) {
 			if !game.World.Spaceship.IsAlive() {
 				continue
 			}
-			// Fire a bullet roughly towards the spaceship
-			drift := utils.RndFloat32InRange(-alien.bulletDrift, alien.bulletDrift)
-			shootDirection := rl.Vector2Normalize(rl.Vector2Subtract(game.World.Spaceship.Position, alien.Position))
-			shootDirection = rl.Vector2Rotate(shootDirection, drift)
-			bullet := NewBullet(alien.Position, rl.Vector2Scale(shootDirection, bulletSpeed), false)
-			game.World.Objects.Add(&bullet)
-			game.EventBus.Publish("alien:fire")
+
+			// Alien does one of three things: fire, change direction, nothing
+			if utils.Chance(0.3) {
+				// Change direction
+				rl.TraceLog(rl.LogInfo, "Alien changing direction")
+				alien.randomizeAlienTarget()
+			} else if utils.Chance(0.5) {
+				// Fire a bullet roughly towards the spaceship
+				drift := utils.RndFloat32InRange(-alien.bulletDrift, alien.bulletDrift)
+				shootDirection := rl.Vector2Normalize(rl.Vector2Subtract(game.World.Spaceship.Position, alien.Position))
+				shootDirection = rl.Vector2Rotate(shootDirection, drift)
+				bullet := NewBullet(alien.Position, rl.Vector2Scale(shootDirection, bulletSpeed), false)
+				game.World.Objects.Add(&bullet)
+				game.EventBus.Publish("alien:fire")
+			}
 		}
 	}
 }
@@ -248,20 +270,11 @@ func newSpawnedAlien(game *Game, position rl.Vector2) *Alien {
 		size = AlienSmall
 	}
 	spawnedAlien := NewAlien(size, position)
-
-	// Point the alien towards a random position on the playfield
-	target := game.World.RandomPosition()
-	spawnedAlien.Velocity = rl.Vector2Normalize(rl.Vector2Subtract(target, spawnedAlien.Position))
+	spawnedAlien.randomizeAlienTarget()
 
 	if size == AlienBig {
-		// Large aliens are slower and less accurate shooters
-		sp := utils.RndFloat32InRange(alienMaxSpeed/2, alienMaxSpeed) / 2
-		spawnedAlien.Velocity = rl.Vector2Scale(spawnedAlien.Velocity, sp)
 		spawnedAlien.bulletDrift = utils.RndFloat32(alienMaxBulletDrift)
 	} else {
-		// Small aliens are faster and more accurate shooters
-		sp := utils.RndFloat32InRange(alienMaxSpeed/2, alienMaxSpeed)
-		spawnedAlien.Velocity = rl.Vector2Scale(spawnedAlien.Velocity, sp)
 		spawnedAlien.bulletDrift = utils.RndFloat32(alienMaxBulletDrift) / 3
 	}
 	return &spawnedAlien

@@ -32,7 +32,7 @@ const (
 
 	alienMaxSpeed       float32 = 300.0
 	alienMaxBulletDrift float32 = math.Pi / 4
-	alienMinShootDelay          = 500
+	alienMinActionDelay         = 500
 )
 
 type Game struct {
