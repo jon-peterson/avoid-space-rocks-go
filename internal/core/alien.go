@@ -146,10 +146,10 @@ func (a *Alien) randomizeAlienTarget() {
 	target := game.World.RandomPosition()
 	a.Velocity = rl.Vector2Normalize(rl.Vector2Subtract(target, a.Position))
 	if a.size == AlienBig {
-		sp := utils.RndFloat32InRange(alienMaxSpeed/2, alienMaxSpeed) / 2
+		sp := utils.RndFloat32InRange(alienMaxSpeed/3, alienMaxSpeed) / 2
 		a.Velocity = rl.Vector2Scale(a.Velocity, sp)
 	} else {
-		sp := utils.RndFloat32InRange(alienMaxSpeed/2, alienMaxSpeed)
+		sp := utils.RndFloat32InRange(alienMaxSpeed/3, alienMaxSpeed)
 		a.Velocity = rl.Vector2Scale(a.Velocity, sp)
 	}
 }
