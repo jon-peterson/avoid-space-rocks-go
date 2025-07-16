@@ -3,7 +3,6 @@ package playfield
 import (
 	"avoid_the_space_rocks/internal/core"
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"math"
 )
 
 // Constants for score stuff
@@ -75,7 +74,7 @@ func (sk *ScoreKeeper) alienScoreHandler(size core.AlienSize) {
 }
 
 func (sk *ScoreKeeper) addPoints(points int) {
-	rewardLevel := uint64(math.Floor(float64(uint64(core.GetGame().Score/shipExtraLife))) + 1)
+	rewardLevel := uint64(float64(uint64(core.GetGame().Score/shipExtraLife))) + 1
 	pointsForNewLife := rewardLevel * shipExtraLife
 	core.GetGame().Score += uint64(points)
 	if core.GetGame().Score >= pointsForNewLife && sk.game.Lives < 20 {
