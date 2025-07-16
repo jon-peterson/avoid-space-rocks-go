@@ -64,9 +64,13 @@ func (s *Spaceship) Spawn() {
 	// Wait until spawning won't make the ship explode immediately
 	extendedLocation := gameobjects.ExtendRectangle(s.GetHitbox(), 0.5)
 	dangerous := game.World.Objects.IsRectangleOccupied(extendedLocation)
-	if dangerous {
-		time.Sleep(100 * time.Millisecond)
-		dangerous = game.World.Objects.IsRectangleOccupied(extendedLocation)
+	for {
+		if dangerous {
+			time.Sleep(100 * time.Millisecond)
+			dangerous = game.World.Objects.IsRectangleOccupied(extendedLocation)
+		} else {
+			break
+		}
 	}
 	game.World.Objects.Add(s)
 }
