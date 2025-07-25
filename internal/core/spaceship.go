@@ -163,7 +163,7 @@ func (s *Spaceship) OnDestruction(_ rl.Vector2) error {
 	s.Alive = false
 	// Spawn the pieces flying away
 	for i := range 4 {
-		piece := NewShrapnel(s.Position, s.Spritesheet, uint16(utils.RndInt32InRange(1000, 2000)), i+3)
+		piece := NewShrapnel(s.Position, s.Spritesheet, uint(utils.RndIntInRange(1000, 2000)), i+3)
 		game.World.Objects.Add(&piece)
 	}
 	// Notify other services

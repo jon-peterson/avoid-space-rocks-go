@@ -18,12 +18,12 @@ func RndFloat32InRange(min, max float32) float32 {
 	return min + rand.Float32()*(max-min)
 }
 
-// RndInt32InRange returns a random int32 between min and max. Panics if min >= max.
-func RndInt32InRange(min, max int32) int32 {
+// RndIntInRange returns a random int between min and max. Panics if min >= max.
+func RndIntInRange(min, max int) int {
 	if min >= max {
 		panic("min must be less than max")
 	}
-	return min + rand.Int31n(max-min)
+	return min + rand.Intn(max-min)
 }
 
 // Chance returns true if a random number between 0 and 1 is less than chance.

@@ -21,7 +21,7 @@ const (
 	shipFuelBoost   float32 = 50.0
 
 	bulletSpeed      float32 = 500.0
-	bulletLifetimeMs uint16  = 1250
+	bulletLifetimeMs uint    = 1250
 
 	shrapnelMaxSpeed  float32 = 500.0
 	shrapnelMaxRotate float32 = math.Pi * 12 // 6 rotations per second
@@ -38,10 +38,10 @@ const (
 type Game struct {
 	World *World
 
-	Lives int32
-	Level int32
-	Rocks int32
-	Score uint64
+	Lives int
+	Level int
+	Rocks int
+	Score uint
 
 	Paused    bool
 	DebugMode bool

@@ -109,9 +109,9 @@ func (r *Rock) OnDestruction(bulletVelocity rl.Vector2) error {
 	game := GetGame()
 	r.isAlive = false
 	// Spawn smaller rocks at same location as appropriate for level
-	if int32(r.size) > max(0, 4-game.Level) {
+	if int(r.size) > max(0, 4-game.Level) {
 		// Span more rocks at higher levels, but if we've hit our cap, replace one for one
-		toSpawn := utils.RndInt32InRange(2, max(3, int32(game.Level/2)))
+		toSpawn := utils.RndIntInRange(2, max(3, int(game.Level/2)))
 		if game.Rocks >= rockMaxCount {
 			toSpawn = 1
 		}
@@ -129,9 +129,9 @@ func (r *Rock) OnDestruction(bulletVelocity rl.Vector2) error {
 	}
 	// Spawn shrapnel in random directions and lifespans
 	sheet := gameobjects.LoadSpriteSheet("shrapnel.png", 5, 1)
-	for range utils.RndInt32InRange(int32(r.size)+2, int32(r.size*2)+4) {
-		frame := int(utils.RndInt32InRange(0, 4))
-		shrapnel := NewShrapnel(r.Position, sheet, uint16(utils.RndInt32InRange(300, 600)), frame)
+	for range utils.RndIntInRange(int(r.size)+2, int(r.size*2)+4) {
+		frame := int(utils.RndIntInRange(0, 4))
+		shrapnel := NewShrapnel(r.Position, sheet, uint(utils.RndIntInRange(300, 600)), frame)
 		game.World.Objects.Add(&shrapnel)
 	}
 	// Notify other services

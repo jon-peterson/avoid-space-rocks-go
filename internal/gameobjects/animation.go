@@ -10,10 +10,10 @@ import (
 type SpriteSheet struct {
 	name        string
 	texture     rl.Texture2D // The texture with the packed sprites
-	frameWidth  int32        // Width of each frame in pixels
-	frameHeight int32        // Height of each frame pixels
-	rows        int32        // the number of rows in the spritesheet
-	cols        int32        // the number of columns in the spritesheet
+	frameWidth  int          // Width of each frame in pixels
+	frameHeight int          // Height of each frame pixels
+	rows        int          // the number of rows in the spritesheet
+	cols        int          // the number of columns in the spritesheet
 	origin      rl.Vector2   // The middle of the sprite (for rotation)
 }
 
@@ -32,7 +32,7 @@ func newSpriteManager() *SpriteManager {
 
 // LoadSpriteSheet creates a new spritesheet from the given file, with deferred loading of
 // the actual texture. These are cached for performance.
-func LoadSpriteSheet(file string, rows, cols int32) *SpriteSheet {
+func LoadSpriteSheet(file string, rows, cols int) *SpriteSheet {
 	spriteManager.mapLock.RLock()
 	if sprite, ok := spriteManager.spritesMap[file]; ok {
 		spriteManager.mapLock.RUnlock()
@@ -61,13 +61,13 @@ func (s *SpriteSheet) populateTexture() error {
 		return nil
 	}
 	sheetTexture := rl.LoadTexture("assets/sprites/" + s.name)
-	if sheetTexture.Width%s.cols != 0 || sheetTexture.Height%s.rows != 0 {
+	if int(sheetTexture.Width)%s.cols != 0 || int(sheetTexture.Height)%s.rows != 0 {
 		return fmt.Errorf("spritesheet of dimensions (%d,%d) can't be broken into %d rows and %d cols",
 			sheetTexture.Width, sheetTexture.Height, s.rows, s.cols)
 	}
 	s.texture = sheetTexture
-	s.frameWidth = sheetTexture.Width / s.cols
-	s.frameHeight = sheetTexture.Height / s.rows
+	s.frameWidth = int(sheetTexture.Width) / s.cols
+	s.frameHeight = int(sheetTexture.Height) / s.rows
 	s.origin = rl.NewVector2(float32(s.frameWidth)/2, float32(s.frameHeight)/2)
 	spriteManager.spritesMap[s.name] = s
 	return nil

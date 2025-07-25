@@ -10,15 +10,15 @@ type Shrapnel struct {
 	gameobjects.Rigidbody
 	spritesheet   *gameobjects.SpriteSheet
 	rotationSpeed float32 // rotations per second
-	lifespanMs    uint16  // How long the shrapnel lives in ms
-	ageMs         uint16  // How long the shrapnel has been alive
+	lifespanMs    uint    // How long the shrapnel lives in ms
+	ageMs         uint    // How long the shrapnel has been alive
 	frame         int
 }
 
 var _ gameobjects.GameObject = (*Shrapnel)(nil)
 
 // NewShrapnel creates a new piece of shrapnel with random direction and lifetime
-func NewShrapnel(position rl.Vector2, sheet *gameobjects.SpriteSheet, lifespan uint16, frame int) Shrapnel {
+func NewShrapnel(position rl.Vector2, sheet *gameobjects.SpriteSheet, lifespan uint, frame int) Shrapnel {
 	shrapnel := Shrapnel{
 		spritesheet: sheet,
 		Rigidbody: gameobjects.Rigidbody{
@@ -52,7 +52,7 @@ func (s *Shrapnel) Update(delta float32) error {
 	s.Rotation = rl.Vector2Rotate(s.Rotation, s.rotationSpeed*delta)
 	s.Rigidbody.ApplyPhysics(delta)
 	s.Position = game.World.Wraparound(s.Position)
-	s.ageMs += uint16(delta * 1000)
+	s.ageMs += uint(delta * 1000)
 	return nil
 }
 

@@ -19,7 +19,7 @@ const (
 // The sprite file specifies filename, rows, and columns
 var alienSpriteFile = []struct {
 	filename string
-	row, col int32
+	row, col int
 }{
 	{"alien_small.png", 3, 3},
 	{"alien_big.png", 2, 2},
@@ -116,8 +116,8 @@ func (a *Alien) OnDestruction(_ rl.Vector2) error {
 	// Spawn shrapnel in random directions and lifespans
 	sheet := gameobjects.LoadSpriteSheet("shrapnel.png", 5, 1)
 	for range 6 {
-		frame := int(utils.RndInt32InRange(0, 4))
-		shrapnel := NewShrapnel(a.Position, sheet, uint16(utils.RndInt32InRange(200, 400)), frame)
+		frame := int(utils.RndIntInRange(0, 4))
+		shrapnel := NewShrapnel(a.Position, sheet, uint(utils.RndIntInRange(200, 400)), frame)
 		game.World.Objects.Add(&shrapnel)
 	}
 	// Cancel the runner goroutine if it exists
@@ -214,7 +214,7 @@ func AlienRunner(ctx context.Context, alien *Alien) {
 	game := GetGame()
 
 	// Small aliens do things more frequently
-	actionDelay := 3000 - int32(300*game.Level)
+	actionDelay := 3000 - int(300*game.Level)
 	if alien.size == AlienSmall {
 		actionDelay /= 2
 	}
@@ -266,7 +266,7 @@ func AlienRunner(ctx context.Context, alien *Alien) {
 func newSpawnedAlien(game *Game, position rl.Vector2) *Alien {
 	// Spawn a new alien
 	size := AlienBig
-	if game.Level > 2 && utils.RndInt32InRange(0, 10) < game.Level {
+	if game.Level > 2 && utils.RndIntInRange(0, 10) < game.Level {
 		size = AlienSmall
 	}
 	spawnedAlien := NewAlien(size, position)

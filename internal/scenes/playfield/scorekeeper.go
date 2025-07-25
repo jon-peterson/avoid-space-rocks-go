@@ -74,9 +74,9 @@ func (sk *ScoreKeeper) alienScoreHandler(size core.AlienSize) {
 }
 
 func (sk *ScoreKeeper) addPoints(points int) {
-	rewardLevel := uint64(float64(uint64(core.GetGame().Score/shipExtraLife))) + 1
+	rewardLevel := uint(float64(uint(core.GetGame().Score/shipExtraLife))) + 1
 	pointsForNewLife := rewardLevel * shipExtraLife
-	core.GetGame().Score += uint64(points)
+	core.GetGame().Score += uint(points)
 	if core.GetGame().Score >= pointsForNewLife && sk.game.Lives < 20 {
 		sk.game.Lives += 1
 		sk.game.EventBus.Publish("spaceship:extra_life")

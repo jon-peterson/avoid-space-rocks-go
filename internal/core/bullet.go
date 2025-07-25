@@ -10,7 +10,7 @@ type Bullet struct {
 	spritesheet   *gameobjects.SpriteSheet
 	isAlive       bool
 	isPlayerFired bool
-	ageMs         uint16
+	ageMs         uint
 }
 
 var _ gameobjects.Collidable = (*Bullet)(nil)
@@ -39,7 +39,7 @@ func (b *Bullet) Update(delta float32) error {
 	game := GetGame()
 	b.Rigidbody.ApplyPhysics(delta)
 	b.Position = game.World.Wraparound(b.Position)
-	b.ageMs += uint16(delta * 1000)
+	b.ageMs += uint(delta * 1000)
 	return nil
 }
 
