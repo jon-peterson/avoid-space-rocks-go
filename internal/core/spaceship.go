@@ -20,6 +20,7 @@ var _ gameobjects.Collidable = (*Spaceship)(nil)
 var _ gameobjects.Destructible = (*Spaceship)(nil)
 var _ gameobjects.GameObject = (*Spaceship)(nil)
 
+// NewSpaceship creates a new spaceship with the default sprite sheet and initial values.
 func NewSpaceship() Spaceship {
 	sheet := gameobjects.LoadSpriteSheet("spaceship.png", 7, 1)
 	ship := Spaceship{
@@ -33,7 +34,7 @@ func NewSpaceship() Spaceship {
 	return ship
 }
 
-// Update the status of the spaceship
+// Update applies physics to the spaceship, updating its position and velocity.
 func (s *Spaceship) Update(delta float32) error {
 	game := GetGame()
 	if s.FuelBurning {
@@ -48,8 +49,9 @@ func (s *Spaceship) Update(delta float32) error {
 	return nil
 }
 
-// Spawn the spaceship at the center of the playfield at the start of level. This function may take a long
-// time to return because it waits until the spaceship can spawn at a safe place; call appropriately.
+// Spawn places the spaceship at the center of the playfield at the start of level. This function may take time
+// to return because it waits until the spaceship can spawn safely (i.e., not in the middle of a rock).
+// After ten seconds it will spawn anyway, but this is a last resort.
 func (s *Spaceship) Spawn() {
 	game := GetGame()
 	s.Alive = true
@@ -61,21 +63,20 @@ func (s *Spaceship) Spawn() {
 	s.Acceleration = rl.Vector2{}
 	s.Rotation = rl.Vector2{X: 0, Y: -1}
 
-	// Wait until spawning won't make the ship explode immediately
+	// Wait up to ten seconds until spawning won't make the ship explode immediately
 	extendedLocation := gameobjects.ExtendRectangle(s.GetHitbox(), 0.5)
 	dangerous := game.World.Objects.IsRectangleOccupied(extendedLocation)
-	for {
-		if dangerous {
-			time.Sleep(100 * time.Millisecond)
-			dangerous = game.World.Objects.IsRectangleOccupied(extendedLocation)
-		} else {
-			break
-		}
+	elapsed := time.Duration(0)
+	tick := 100 * time.Millisecond
+	for dangerous && elapsed < 10*time.Second {
+		time.Sleep(tick)
+		elapsed += tick
+		dangerous = game.World.Objects.IsRectangleOccupied(extendedLocation)
 	}
 	game.World.Objects.Add(s)
 }
 
-// Draw the spaceship at its current position and rotation
+// Draw draws the spaceship at its current position and rotation.
 func (s *Spaceship) Draw() error {
 	if !s.InHyperspace {
 		frame := s.frameIndex()
@@ -84,21 +85,21 @@ func (s *Spaceship) Draw() error {
 	return nil
 }
 
-// RotateLeft rotates the spaceship to the left the standard amount
+// RotateLeft rotates the spaceship to the left the standard amount.
 func (s *Spaceship) RotateLeft() {
 	delta := rl.GetFrameTime()
 	s.Rotation = rl.Vector2Rotate(s.Rotation, -shipRotateSpeed*delta)
 }
 
-// RotateRight rotates the spaceship to the right the standard amount
+// RotateRight rotates the spaceship to the right the standard amount.
 func (s *Spaceship) RotateRight() {
 	delta := rl.GetFrameTime()
 	s.Rotation = rl.Vector2Rotate(s.Rotation, shipRotateSpeed*delta)
 }
 
-// Fire creates a new bullet with the spaceship's current position and rotation
+// Fire creates a new bullet with the spaceship's current position and rotation.
 func (s *Spaceship) Fire() {
-	// Create the starting position of the bullet so it's outside of the hitbox
+	// Create the starting position of the bullet so it's outside the hitbox
 	hitbox := s.GetHitbox()
 	bulletOffset := float32(math.Max(float64(hitbox.Width), float64(hitbox.Height))) / 2
 	startPos := rl.Vector2Add(s.Position, rl.Vector2Scale(s.Rotation, bulletOffset))
@@ -111,25 +112,29 @@ func (s *Spaceship) Fire() {
 	game.EventBus.Publish("spaceship:fire")
 }
 
-// EnterHyperspace causes the spaceship to jump to a random location on the playfield
+// EnterHyperspace causes the spaceship to jump to a random location on the playfield.
 func (s *Spaceship) EnterHyperspace() {
 	game := GetGame()
 	game.EventBus.Publish("spaceship:enter_hyperspace")
 }
 
+// IsAlive returns whether the spaceship is currently alive.
 func (s *Spaceship) IsAlive() bool {
 	return s.Alive
 }
 
+// IsEnemy returns false; the spaceship is not an enemy.
 func (s *Spaceship) IsEnemy() bool {
 	return false
 }
 
+// OnCollision is called when the spaceship is hitting something else.
 func (s *Spaceship) OnCollision(_ gameobjects.Collidable) error {
 	// Spaceship is always considered the anvil so we always do nothing here
 	return nil
 }
 
+// GetHitbox returns the hitbox of the spaceship, used for basic collision detection.
 func (s *Spaceship) GetHitbox() rl.Rectangle {
 	return s.Spritesheet.GetRectangle(s.Position)
 }
