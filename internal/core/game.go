@@ -89,7 +89,7 @@ func (g *Game) StartLevel() {
 	g.Rocks = 0
 
 	// Display the level number for a few seconds
-	rl.TraceLog(rl.LogInfo, fmt.Sprintf("Starting level %d", g.Level))
+	rl.TraceLog(rl.LogInfo, "Starting level %d", g.Level)
 	g.Overlay = func() {
 		utils.CenterText(fmt.Sprintf("Level %d", g.Level), rl.Vector2{X: g.World.Width / 2, Y: g.World.Height / 3}, 60)
 	}
