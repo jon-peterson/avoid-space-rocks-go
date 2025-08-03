@@ -30,11 +30,11 @@ build: test
 
 # Download raylib Windows DLL if it doesn't exist
 raylib-windows:
-	@mkdir -p bin/downloads
-	@if [ ! -f bin/downloads/raylib-5.0_win64_mingw-w64.zip ]; then \
+	@mkdir -p bin/downloads/raylib-windows
+	@if [ ! -f bin/downloads/raylib-windows/raylib-5.5_win64_mingw-w64/lib/raylib.dll ]; then \
 		echo "Downloading raylib Windows DLL..."; \
-		curl -L -o bin/downloads/raylib-5.0_win64_mingw-w64.zip https://github.com/raysan5/raylib/releases/download/5.0/raylib-5.0_win64_mingw-w64.zip; \
-		unzip -o bin/downloads/raylib-5.0_win64_mingw-w64.zip -d bin/downloads/; \
+		curl -L -o bin/downloads/raylib-5.5.0-w64-mingw.zip https://github.com/raysan5/raylib/releases/download/5.5/raylib-5.5_win64_mingw-w64.zip; \
+		unzip -o bin/downloads/raylib-5.5.0-w64-mingw.zip -d bin/downloads/raylib-windows; \
 	fi
 
 # Build for Windows (64-bit)
@@ -45,11 +45,11 @@ build-windows: test raylib-windows
 
 # Download raylib Linux libraries if they don't exist
 raylib-linux:
-	@mkdir -p bin/downloads/linux
-	@if [ ! -f bin/downloads/linux/raylib-5.0_linux_amd64.tar.gz ]; then \
+	@mkdir -p bin/downloads/raylib-linux
+	@if [ ! -f bin/downloads/raylib-linux/raylib-5.5_linux_amd64/lib/libraylib.so ]; then \
 		echo "Downloading raylib Linux libraries..."; \
-		curl -L -o bin/downloads/linux/raylib-5.0_linux_amd64.tar.gz https://github.com/raysan5/raylib/releases/download/5.0/raylib-5.0_linux_amd64.tar.gz; \
-		tar -xzf bin/downloads/linux/raylib-5.0_linux_amd64.tar.gz -C bin/downloads/linux/; \
+		curl -L -o bin/downloads/raylib-linux/raylib-5.5.0_linux_amd64_from_build.tar.gz https://github.com/raysan5/raylib/releases/download/5.5/raylib-5.5_linux_amd64.tar.gz; \
+		tar -xzf bin/downloads/raylib-linux/raylib-5.5.0_linux_amd64_from_build.tar.gz -C bin/downloads/raylib-linux/; \
 	fi
 
 # Build for Linux (64-bit)
@@ -72,11 +72,11 @@ package: all-platforms
 
 	@# Copy Windows files
 	@cp bin/windows/avoid-space-rocks.exe bin/package-windows/
-	@cp bin/downloads/raylib-5.0_win64_mingw-w64/lib/raylib.dll bin/package-windows/
+	@cp bin/downloads/raylib-windows/raylib-5.5_win64_mingw-w64/lib/raylib.dll bin/package-windows/
 
 	@# Copy Linux files and libraries
 	@cp bin/linux/avoid-space-rocks bin/package-linux/
-	@cp bin/downloads/linux/raylib-5.0_linux_amd64/lib/libraylib.so* bin/package-linux/
+	@cp bin/downloads/raylib-linux/raylib-5.5_linux_amd64/lib/libraylib.so* bin/package-linux/
 
 	@# Copy assets to both packages
 	@cp -r assets bin/package-linux/
