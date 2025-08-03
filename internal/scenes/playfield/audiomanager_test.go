@@ -8,6 +8,11 @@ import (
 )
 
 func TestMain(m *testing.M) {
+	// Change to the project root directory
+	if err := os.Chdir("../../.."); err != nil {
+		panic("failed to change to project root directory: " + err.Error())
+	}
+
 	rl.InitAudioDevice()
 	defer rl.CloseAudioDevice()
 	os.Exit(m.Run())
