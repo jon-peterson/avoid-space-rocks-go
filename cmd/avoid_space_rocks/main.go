@@ -5,15 +5,17 @@ import (
 	"avoid_the_space_rocks/internal/scenes/attractmode"
 	"avoid_the_space_rocks/internal/scenes/gameover"
 	"avoid_the_space_rocks/internal/scenes/playfield"
-	rl "github.com/gen2brain/raylib-go/raylib"
 	"os"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 const (
-	screenWidth  = 1024.0
-	screenHeight = 768.0
+	screenWidth  = 1024
+	screenHeight = 768
 )
 
+// main is the entry point for the application. Spawns a window and runs the game inside.
 func main() {
 	rl.InitWindow(screenWidth, screenHeight, "Avoid the Space Rocks")
 	defer rl.CloseWindow()
@@ -36,6 +38,7 @@ func main() {
 	}
 }
 
+// initScene initializes and returns the scene corresponding to the given scene code.
 func initScene(code scenes.SceneCode) scenes.Scene {
 	if code == scenes.AttractModeScene {
 		am := &attractmode.AttractMode{}
