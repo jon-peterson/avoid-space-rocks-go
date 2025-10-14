@@ -2,7 +2,7 @@ package utils
 
 import "math/rand"
 
-// RndFloat32 returns a random float32 between 0 and max. Panics if <= 0.
+// RndFloat32 returns a random float32 between [0, max). Panics if <= 0.
 func RndFloat32(max float32) float32 {
 	if max <= 0 {
 		panic("max must be greater than 0")
@@ -10,7 +10,7 @@ func RndFloat32(max float32) float32 {
 	return rand.Float32() * max
 }
 
-// RndFloat32InRange returns a random float32 between min and max. Panics if min >= max.
+// RndFloat32InRange returns a random float32 between [min, max). Panics if min >= max.
 func RndFloat32InRange(min, max float32) float32 {
 	if min >= max {
 		panic("min must be less than max")
@@ -18,12 +18,12 @@ func RndFloat32InRange(min, max float32) float32 {
 	return min + rand.Float32()*(max-min)
 }
 
-// RndIntInRange returns a random int between min and max. Panics if min >= max.
+// RndIntInRange returns a random int between [min,max]. Panics if min >= max.
 func RndIntInRange(min, max int) int {
 	if min >= max {
 		panic("min must be less than max")
 	}
-	return min + rand.Intn(max-min)
+	return min + rand.Intn(max-min+1)
 }
 
 // Chance returns true if a random number between 0 and 1 is less than chance.
