@@ -2,6 +2,7 @@ package gameobjects
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"sync"
 	"testing"
 )
 
@@ -262,5 +263,66 @@ func TestGameObjectCollectionIsPositionOccupied(t *testing.T) {
 				t.Errorf("IsRectangleOccupied() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestGameObjectCollectionConcurrentAddAndHasRemainingEnemies(t *testing.T) {
+	collection := NewGameObjectCollection()
+	const iterations = 1000
+
+	var wg sync.WaitGroup
+	wg.Add(3)
+
+	// Writer goroutine continuously staging new objects (non-enemies or non-persistent enemies
+	// so HasRemainingEnemies must inspect newObjects as well as objects)
+	go func() {
+		defer wg.Done()
+		for i := range iterations {
+			collection.Add(&MockGameObject{alive: false, enemy: i%2 == 0})
+		}
+	}()
+
+	// Updater goroutine continuously moving newObjects to objects and pruning dead ones
+	go func() {
+		defer wg.Done()
+		for range iterations {
+			collection.Update(0.016)
+		}
+	}()
+
+	// Reader goroutine continuously checking for remaining enemies
+	go func() {
+		defer wg.Done()
+		for range iterations {
+			_ = collection.HasRemainingEnemies()
+		}
+	}()
+
+	wg.Wait()
+}
+
+func TestGameObjectCollectionHasRemainingEnemiesDuringBirthNew(t *testing.T) {
+	const iterations = 1000
+
+	for range iterations {
+		collection := NewGameObjectCollection()
+		collection.Add(&MockGameObject{alive: true, enemy: true})
+
+		var wg sync.WaitGroup
+		wg.Add(2)
+
+		go func() {
+			defer wg.Done()
+			collection.Update(0.016)
+		}()
+
+		go func() {
+			defer wg.Done()
+			if !collection.HasRemainingEnemies() {
+				t.Errorf("HasRemainingEnemies() returned false while enemy was transitioning from newObjects to objects")
+			}
+		}()
+
+		wg.Wait()
 	}
 }
