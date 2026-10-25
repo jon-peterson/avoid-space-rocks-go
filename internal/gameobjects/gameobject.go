@@ -78,7 +78,9 @@ func (c *GameObjectCollection) Draw() {
 // live in the standard set or any in the newly added set.
 func (c *GameObjectCollection) HasRemainingEnemies() bool {
 	c.objectsLock.RLock()
+	c.newObjectsLock.RLock()
 	defer c.objectsLock.RUnlock()
+	defer c.newObjectsLock.RUnlock()
 
 	for _, obj := range c.objects {
 		if obj.IsEnemy() && obj.IsAlive() {

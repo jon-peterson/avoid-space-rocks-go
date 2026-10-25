@@ -2,14 +2,17 @@ package gameobjects
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"sync"
+	"sync/atomic"
 	"testing"
 )
 
 type MockGameObject struct {
-	name   string
-	alive  bool
-	enemy  bool
-	hitbox rl.Rectangle
+	name        string
+	alive       bool
+	atomicAlive *atomic.Bool
+	enemy       bool
+	hitbox      rl.Rectangle
 }
 
 func (m *MockGameObject) Update(_ float32) error {
@@ -21,6 +24,9 @@ func (m *MockGameObject) Draw() error {
 }
 
 func (m *MockGameObject) IsAlive() bool {
+	if m.atomicAlive != nil {
+		return m.atomicAlive.Load()
+	}
 	return m.alive
 }
 
@@ -263,4 +269,87 @@ func TestGameObjectCollectionIsPositionOccupied(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGameObjectCollectionConcurrentAddAndHasRemainingEnemies(t *testing.T) {
+	collection := NewGameObjectCollection()
+	const iterations = 1000
+
+	var wg sync.WaitGroup
+	wg.Add(3)
+
+	// Writer goroutine continuously staging new objects (non-enemies or non-persistent enemies
+	// so HasRemainingEnemies must inspect newObjects as well as objects)
+	go func() {
+		defer wg.Done()
+		for i := range iterations {
+			collection.Add(&MockGameObject{alive: false, enemy: i%2 == 0})
+		}
+	}()
+
+	// Updater goroutine continuously moving newObjects to objects and pruning dead ones
+	go func() {
+		defer wg.Done()
+		for range iterations {
+			collection.Update(0.016)
+		}
+	}()
+
+	// Reader goroutine continuously checking for remaining enemies
+	go func() {
+		defer wg.Done()
+		for range iterations {
+			_ = collection.HasRemainingEnemies()
+		}
+	}()
+
+	wg.Wait()
+}
+
+func TestGameObjectCollectionHasRemainingEnemiesDuringEnemyReplacement(t *testing.T) {
+	collection := NewGameObjectCollection()
+	const iterations = 1000
+
+	newEnemy := func() *MockGameObject {
+		alive := &atomic.Bool{}
+		alive.Store(true)
+		return &MockGameObject{atomicAlive: alive, enemy: true}
+	}
+
+	// Seed with one alive enemy in the active collection
+	currentEnemy := newEnemy()
+	collection.Add(currentEnemy)
+	collection.Update(0.016)
+
+	done := make(chan struct{})
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	// Reader goroutine must always observe at least one remaining enemy
+	go func() {
+		defer wg.Done()
+		for {
+			select {
+			case <-done:
+				return
+			default:
+				if !collection.HasRemainingEnemies() {
+					t.Errorf("HasRemainingEnemies() returned false while an enemy was still present")
+					return
+				}
+			}
+		}
+	}()
+
+	// Simulate rock destruction: spawn replacement enemy into newObjects, mark old one dead, and Update
+	for range iterations {
+		nextEnemy := newEnemy()
+		collection.Add(nextEnemy)
+		currentEnemy.atomicAlive.Store(false)
+		collection.Update(0.016)
+		currentEnemy = nextEnemy
+	}
+
+	close(done)
+	wg.Wait()
 }
