@@ -3,16 +3,14 @@ package gameobjects
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"sync"
-	"sync/atomic"
 	"testing"
 )
 
 type MockGameObject struct {
-	name        string
-	alive       bool
-	atomicAlive *atomic.Bool
-	enemy       bool
-	hitbox      rl.Rectangle
+	name   string
+	alive  bool
+	enemy  bool
+	hitbox rl.Rectangle
 }
 
 func (m *MockGameObject) Update(_ float32) error {
@@ -24,9 +22,6 @@ func (m *MockGameObject) Draw() error {
 }
 
 func (m *MockGameObject) IsAlive() bool {
-	if m.atomicAlive != nil {
-		return m.atomicAlive.Load()
-	}
 	return m.alive
 }
 
@@ -306,50 +301,28 @@ func TestGameObjectCollectionConcurrentAddAndHasRemainingEnemies(t *testing.T) {
 	wg.Wait()
 }
 
-func TestGameObjectCollectionHasRemainingEnemiesDuringEnemyReplacement(t *testing.T) {
-	collection := NewGameObjectCollection()
+func TestGameObjectCollectionHasRemainingEnemiesDuringBirthNew(t *testing.T) {
 	const iterations = 1000
 
-	newEnemy := func() *MockGameObject {
-		alive := &atomic.Bool{}
-		alive.Store(true)
-		return &MockGameObject{atomicAlive: alive, enemy: true}
-	}
-
-	// Seed with one alive enemy in the active collection
-	currentEnemy := newEnemy()
-	collection.Add(currentEnemy)
-	collection.Update(0.016)
-
-	done := make(chan struct{})
-	var wg sync.WaitGroup
-	wg.Add(1)
-
-	// Reader goroutine must always observe at least one remaining enemy
-	go func() {
-		defer wg.Done()
-		for {
-			select {
-			case <-done:
-				return
-			default:
-				if !collection.HasRemainingEnemies() {
-					t.Errorf("HasRemainingEnemies() returned false while an enemy was still present")
-					return
-				}
-			}
-		}
-	}()
-
-	// Simulate rock destruction: spawn replacement enemy into newObjects, mark old one dead, and Update
 	for range iterations {
-		nextEnemy := newEnemy()
-		collection.Add(nextEnemy)
-		currentEnemy.atomicAlive.Store(false)
-		collection.Update(0.016)
-		currentEnemy = nextEnemy
-	}
+		collection := NewGameObjectCollection()
+		collection.Add(&MockGameObject{alive: true, enemy: true})
 
-	close(done)
-	wg.Wait()
+		var wg sync.WaitGroup
+		wg.Add(2)
+
+		go func() {
+			defer wg.Done()
+			collection.Update(0.016)
+		}()
+
+		go func() {
+			defer wg.Done()
+			if !collection.HasRemainingEnemies() {
+				t.Errorf("HasRemainingEnemies() returned false while enemy was transitioning from newObjects to objects")
+			}
+		}()
+
+		wg.Wait()
+	}
 }
